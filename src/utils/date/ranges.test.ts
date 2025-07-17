@@ -1,4 +1,4 @@
-import { generateDateRange, groupByMonth, formatDateForDisplay } from './ranges';
+import { generateDateRange, groupByMonth, formatDateForDisplay } from '../timeUtils';
 
 describe('ranges', () => {
   it('generates a date range', () => {

@@ -3,7 +3,7 @@ import {
   convertTimeToZone,
   getCurrentTimezoneOffset,
   getSlotBgColor,
-} from './calculations';
+} from '../timeUtils';
 
 describe('calculations', () => {
   it('gets current time in zone', () => {

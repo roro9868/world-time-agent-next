@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { toZonedTime } from 'date-fns-tz';
 import { isToday, isWeekend } from 'date-fns';
-import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/date/ranges';
+import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
 
 interface DateBarProps {
   selectedDate: Date;

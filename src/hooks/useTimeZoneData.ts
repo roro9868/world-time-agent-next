@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Location, TimeZone } from '../types';
 import { generateAlignedTimeSlots } from '../utils/timeUtils';
-import { getCurrentTimeInZone } from '../utils/time/calculations';
+import { getCurrentTimeInZone } from '../utils/timeUtils';
 import cityTimezones from 'city-timezones';
 import { toZonedTime } from 'date-fns-tz';
 
