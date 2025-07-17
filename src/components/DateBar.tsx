@@ -74,8 +74,8 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
       {/* Calendar Popover with shadcn/ui styling */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="w-9 h-9 p-0 transition-all duration-200 border-gray-200 hover:border-gray-300 hover:bg-gray-50">
-            <Calendar className="w-4 h-4 text-gray-600" />
+          <Button size="icon" className="w-12 h-12 p-0 bg-white hover:bg-gray-100 focus:bg-gray-100 transition-all duration-200 border-none shadow-none outline-none [&_svg]:!size-10">
+            <Calendar size={32} className="text-gray-700" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
