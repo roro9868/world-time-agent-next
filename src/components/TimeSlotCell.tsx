@@ -12,7 +12,11 @@ interface TimeSlotCellProps {
   selectedTime: Date;
 }
 
-const getTimeSlotBackgroundColor = (slot: TimeSlot, isSelected: boolean, isCurrent: boolean): string => {
+const getTimeSlotBackgroundColor = (
+  slot: TimeSlot,
+  isSelected: boolean,
+  isCurrent: boolean,
+): string => {
   // Remove blue highlight for selected slot
   if (isCurrent) return 'ring-2 ring-green-400';
   return getSlotBgColor(slot.hour, slot.minute);
@@ -36,7 +40,8 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
    * - The first column always shows the date label for context
    * - Every local midnight (or 12:30AM for half-hour timezones) also shows the date label
    */
-  const showDateLabel = colIdx === 0 || (slot.hour === 0 && (slot.minute === 0 || slot.minute === 30));
+  const showDateLabel =
+    colIdx === 0 || (slot.hour === 0 && (slot.minute === 0 || slot.minute === 30));
 
   // Debug: Log slot info for LA midnight slots
   // if (timezone.name === 'America/Los_Angeles' && isNewDay) {
@@ -55,8 +60,9 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   if (timeLabel.endsWith(':00')) {
     timeLabel = timeLabel.replace(':00', '');
   }
-  const isSelected = slot.hour === selectedTime.getHours() && slot.minute === selectedTime.getMinutes();
-  
+  const isSelected =
+    slot.hour === selectedTime.getHours() && slot.minute === selectedTime.getMinutes();
+
   // Create comprehensive aria-label for accessibility
   const ariaLabel = `${formattedTime} in ${timezone.city}${slot.isCurrent ? ' - Current time' : ''}${isSelected ? ' - Selected time' : ''}. Click to select this time.`;
 
@@ -88,16 +94,28 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           title={`${formattedTime} - ${slot.isCurrent ? 'Current time' : 'Click to select'}`}
           tabIndex={0}
         >
-          <span className={
-            timeLabel.includes(':')
-              ? 'text-xs sm:text-sm leading-none'
-              : 'text-sm sm:text-base leading-none'
-          } style={{ lineHeight: '1.05' }}>{timeLabel}</span>
-          {ampm && <span className="text-[10px] sm:text-xs leading-none -mt" style={{ lineHeight: '1.05' }}>{ampm}</span>}
+          <span
+            className={
+              timeLabel.includes(':')
+                ? 'text-xs sm:text-sm leading-none'
+                : 'text-sm sm:text-base leading-none'
+            }
+            style={{ lineHeight: '1.05' }}
+          >
+            {timeLabel}
+          </span>
+          {ampm && (
+            <span
+              className="text-[10px] sm:text-xs leading-none -mt"
+              style={{ lineHeight: '1.05' }}
+            >
+              {ampm}
+            </span>
+          )}
         </button>
       </div>
     </td>
   );
 };
 
-export default React.memo(TimeSlotCell); 
+export default React.memo(TimeSlotCell);

@@ -9,14 +9,14 @@ import {
   getSlotBgColor,
   generateDateRange,
   groupByMonth,
-  formatDateForDisplay
+  formatDateForDisplay,
 } from '../timeUtils';
 
 // Mock moment-timezone
 jest.mock('moment-timezone', () => ({
   tz: jest.fn(() => ({
-    zoneAbbr: jest.fn(() => 'EST')
-  }))
+    zoneAbbr: jest.fn(() => 'EST'),
+  })),
 }));
 
 describe('timeUtils', () => {
@@ -47,7 +47,7 @@ describe('timeUtils', () => {
     it('generates time slots correctly', () => {
       const baseDate = new Date('2023-01-15');
       const slots = generateAlignedTimeSlots(baseDate, 'America/New_York', 'Europe/London');
-      
+
       expect(slots).toBeInstanceOf(Array);
       expect(slots.length).toBeGreaterThan(0);
       expect(slots[0]).toHaveProperty('hour');
@@ -85,14 +85,14 @@ describe('timeUtils', () => {
   describe('getSlotBgColor', () => {
     it('returns correct background color for daytime', () => {
       expect(getSlotBgColor(12, 0)).toBe('bg-amber-50'); // Noon
-      expect(getSlotBgColor(8, 0)).toBe('bg-amber-50');  // 8 AM
+      expect(getSlotBgColor(8, 0)).toBe('bg-amber-50'); // 8 AM
       expect(getSlotBgColor(18, 0)).toBe('bg-amber-50'); // 6 PM
     });
 
     it('returns correct background color for nighttime', () => {
-      expect(getSlotBgColor(0, 0)).toBe('bg-blue-50');   // Midnight
-      expect(getSlotBgColor(6, 0)).toBe('bg-blue-50');   // 6 AM
-      expect(getSlotBgColor(22, 0)).toBe('bg-blue-50');  // 10 PM
+      expect(getSlotBgColor(0, 0)).toBe('bg-blue-50'); // Midnight
+      expect(getSlotBgColor(6, 0)).toBe('bg-blue-50'); // 6 AM
+      expect(getSlotBgColor(22, 0)).toBe('bg-blue-50'); // 10 PM
     });
   });
 
@@ -100,7 +100,7 @@ describe('timeUtils', () => {
     it('generates correct date range', () => {
       const startDate = new Date('2023-01-01');
       const dates = generateDateRange(startDate, 5);
-      
+
       expect(dates).toHaveLength(5);
       expect(dates[0].toDateString()).toBe('Sun Jan 01 2023');
       expect(dates[4].toDateString()).toBe('Thu Jan 05 2023');
@@ -114,11 +114,11 @@ describe('timeUtils', () => {
         new Date('2023-01-15'),
         new Date('2023-02-01'),
         new Date('2023-02-15'),
-        new Date('2023-03-01')
+        new Date('2023-03-01'),
       ];
-      
+
       const groups = groupByMonth(dates);
-      
+
       expect(groups).toHaveLength(3);
       expect(groups[0].month).toBe('Jan');
       expect(groups[0].start).toBe(0);
@@ -135,10 +135,10 @@ describe('timeUtils', () => {
   describe('formatDateForDisplay', () => {
     it('formats date for display correctly', () => {
       const result = formatDateForDisplay(new Date('2023-01-15'));
-      
+
       expect(result).toHaveProperty('day', 15);
       expect(result).toHaveProperty('weekday');
       expect(typeof result.weekday).toBe('string');
     });
   });
-}); 
+});

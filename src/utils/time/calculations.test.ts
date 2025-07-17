@@ -1,4 +1,9 @@
-import { getCurrentTimeInZone, convertTimeToZone, getCurrentTimezoneOffset, getSlotBgColor } from './calculations';
+import {
+  getCurrentTimeInZone,
+  convertTimeToZone,
+  getCurrentTimezoneOffset,
+  getSlotBgColor,
+} from './calculations';
 
 describe('calculations', () => {
   it('gets current time in zone', () => {
@@ -21,4 +26,4 @@ describe('calculations', () => {
     expect(getSlotBgColor(8, 0)).toBe('bg-amber-50');
     expect(getSlotBgColor(2, 0)).toBe('bg-blue-50');
   });
-}); 
+});

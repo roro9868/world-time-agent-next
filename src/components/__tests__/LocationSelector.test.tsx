@@ -7,42 +7,42 @@ import { TimeZone } from '../../types';
 // Mock city-timezones with the correct structure
 jest.mock('city-timezones', () => ({
   cityMapping: {
-    'London': {
+    London: {
       city: 'London',
       country: 'United Kingdom',
       timezone: 'Europe/London',
       iso2: 'GB',
-      pop: 8982000
+      pop: 8982000,
     },
     'New York': {
       city: 'New York',
       country: 'United States',
       timezone: 'America/New_York',
       iso2: 'US',
-      pop: 8336817
+      pop: 8336817,
     },
-    'Tokyo': {
+    Tokyo: {
       city: 'Tokyo',
       country: 'Japan',
       timezone: 'Asia/Tokyo',
       iso2: 'JP',
-      pop: 13929286
+      pop: 13929286,
     },
-    'Paris': {
+    Paris: {
       city: 'Paris',
       country: 'France',
       timezone: 'Europe/Paris',
       iso2: 'FR',
-      pop: 2161000
+      pop: 2161000,
     },
-    'Berlin': {
+    Berlin: {
       city: 'Berlin',
       country: 'Germany',
       timezone: 'Europe/Berlin',
       iso2: 'DE',
-      pop: 3669491
-    }
-  }
+      pop: 3669491,
+    },
+  },
 }));
 
 describe('LocationSelector', () => {
@@ -55,9 +55,9 @@ describe('LocationSelector', () => {
         city: 'New York',
         country: 'United States',
         offset: -4,
-        flag: '🇺🇸'
-      }
-    ]
+        flag: '🇺🇸',
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -66,9 +66,13 @@ describe('LocationSelector', () => {
 
   it('renders with home city information', () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     expect(screen.getByDisplayValue('')).toBeInTheDocument();
     expect(screen.getByText('United States')).toBeInTheDocument();
     expect(screen.getByText('Current time')).toBeInTheDocument();
@@ -76,9 +80,13 @@ describe('LocationSelector', () => {
 
   it('shows loading state when focused', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -90,9 +98,13 @@ describe('LocationSelector', () => {
 
   it('shows cities after loading', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -107,9 +119,13 @@ describe('LocationSelector', () => {
 
   it('filters results based on search term', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -128,9 +144,13 @@ describe('LocationSelector', () => {
 
   it('calls onAddLocation when a city is selected', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -148,15 +168,19 @@ describe('LocationSelector', () => {
       country: 'United Kingdom',
       offset: 1,
       flag: '🇬🇧',
-      population: 8982000
+      population: 8982000,
     });
   });
 
   it('handles keyboard navigation', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -167,7 +191,7 @@ describe('LocationSelector', () => {
 
     // Press arrow down
     fireEvent.keyDown(input, { key: 'ArrowDown' });
-    
+
     // First option should be selected
     const firstOption = screen.getByText('London').closest('button');
     expect(firstOption).toHaveAttribute('aria-selected', 'true');
@@ -175,9 +199,13 @@ describe('LocationSelector', () => {
 
   it('closes dropdown on escape key', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -195,9 +223,13 @@ describe('LocationSelector', () => {
 
   it('shows "No cities found" when no results', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -215,7 +247,11 @@ describe('LocationSelector', () => {
 
   it('handles empty existing locations gracefully', () => {
     render(
-      <table><tbody><LocationSelector onAddLocation={mockOnAddLocation} existingLocations={[]} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector onAddLocation={mockOnAddLocation} existingLocations={[]} />
+        </tbody>
+      </table>,
     );
 
     // Should render input when no home city exists
@@ -224,9 +260,13 @@ describe('LocationSelector', () => {
 
   it('deduplicates city names within same timezone', async () => {
     render(
-      <table><tbody><LocationSelector {...defaultProps} /></tbody></table>
+      <table>
+        <tbody>
+          <LocationSelector {...defaultProps} />
+        </tbody>
+      </table>,
     );
-    
+
     const input = screen.getByRole('combobox');
     fireEvent.focus(input);
 
@@ -239,4 +279,4 @@ describe('LocationSelector', () => {
     const londonCityEntries = screen.getAllByText(/^London$/);
     expect(londonCityEntries).toHaveLength(1);
   });
-}); 
+});

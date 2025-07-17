@@ -22,7 +22,7 @@ function getTimezoneOffset(timezone: string): number {
   const localTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
   const hour = localTime.getHours();
   const minute = localTime.getMinutes();
-  return (hour - utcHour) + (minute - utcMinute) / 60;
+  return hour - utcHour + (minute - utcMinute) / 60;
 }
 
 // Helper function to get flag emoji from country code
@@ -32,7 +32,7 @@ function countryCodeToFlagEmoji(countryCode: string): string {
     const codePoints = countryCode
       .toUpperCase()
       .split('')
-      .map(char => 127397 + char.charCodeAt(0));
+      .map((char) => 127397 + char.charCodeAt(0));
     return String.fromCodePoint(...codePoints);
   } catch {
     return '🌍';
@@ -46,7 +46,7 @@ function normalizeCountryName(country: string): string {
 
 export const LocationSelector: React.FC<LocationSelectorProps> = ({
   onAddLocation,
-  existingLocations
+  existingLocations,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -55,7 +55,11 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number }>({ left: 0, top: 0, width: 320 });
+  const [dropdownPos, setDropdownPos] = useState<{ left: number; top: number; width: number }>({
+    left: 0,
+    top: 0,
+    width: 320,
+  });
 
   // Get home city (first location in the list)
   const homeCity = existingLocations[0];
@@ -63,7 +67,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   // Load city data from city-timezones library
   const allCityTz = useMemo(() => {
     if (!isFocused) return [];
-    
+
     const cityData = cityTimezones.cityMapping;
     const results: SearchTimeZone[] = [];
 
@@ -77,7 +81,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           country: normalizeCountryName(cityInfo.country),
           offset: offset,
           flag: countryCodeToFlagEmoji(cityInfo.iso2),
-          population: cityInfo.pop || 0
+          population: cityInfo.pop || 0,
         });
       }
     }
@@ -88,9 +92,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   // Filter and sort results based on search term - with better performance
   const matches = useMemo(() => {
     if (allCityTz.length === 0) return [];
-    
+
     const searchLower = debouncedSearchTerm.toLowerCase();
-    const filtered = allCityTz.filter(entry => {
+    const filtered = allCityTz.filter((entry) => {
       const cityMatch = entry.city.toLowerCase().includes(searchLower);
       const countryMatch = entry.country.toLowerCase().includes(searchLower);
       const timezoneMatch = entry.name.toLowerCase().includes(searchLower);
@@ -99,7 +103,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
     // Remove duplicates (same city in same timezone)
     const seen = new Set<string>();
-    const unique = filtered.filter(entry => {
+    const unique = filtered.filter((entry) => {
       const uniqueKey = `${entry.name}:${entry.city}`;
       if (seen.has(uniqueKey)) return false;
       seen.add(uniqueKey);
@@ -107,48 +111,58 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     });
 
     // Exclude cities already shown on the page
-    const shownKeys = new Set(existingLocations.map(loc => `${loc.name}:${loc.city}`));
-    const notShown = unique.filter(entry => !shownKeys.has(`${entry.name}:${entry.city}`));
+    const shownKeys = new Set(existingLocations.map((loc) => `${loc.name}:${loc.city}`));
+    const notShown = unique.filter((entry) => !shownKeys.has(`${entry.name}:${entry.city}`));
 
     // Sort by relevance: exact matches first, then by population
-    return notShown.sort((a, b) => {
-      const aExact = a.city.toLowerCase() === searchLower || a.country.toLowerCase() === searchLower;
-      const bExact = b.city.toLowerCase() === searchLower || b.country.toLowerCase() === searchLower;
-      
-      if (aExact && !bExact) return -1;
-      if (!aExact && bExact) return 1;
-      
-      return (b.population || 0) - (a.population || 0);
-    }).slice(0, 50); // Limit to 50 results for better performance
+    return notShown
+      .sort((a, b) => {
+        const aExact =
+          a.city.toLowerCase() === searchLower || a.country.toLowerCase() === searchLower;
+        const bExact =
+          b.city.toLowerCase() === searchLower || b.country.toLowerCase() === searchLower;
+
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+
+        return (b.population || 0) - (a.population || 0);
+      })
+      .slice(0, 50); // Limit to 50 results for better performance
   }, [allCityTz, debouncedSearchTerm, existingLocations]);
 
-  const handleSelect = useCallback((tz: TimeZone) => {
-    onAddLocation(tz);
-    setSearchTerm('');
-    setActiveIndex(0);
-    setIsFocused(false);
-    if (inputRef.current) {
-      inputRef.current.blur();
-    }
-  }, [onAddLocation]);
-
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && matches.length > 0) {
-      e.preventDefault();
-      handleSelect(matches[activeIndex]);
-    } else if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex(prev => Math.min(prev + 1, matches.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex(prev => Math.max(prev - 1, 0));
-    } else if (e.key === 'Escape') {
+  const handleSelect = useCallback(
+    (tz: TimeZone) => {
+      onAddLocation(tz);
+      setSearchTerm('');
+      setActiveIndex(0);
       setIsFocused(false);
       if (inputRef.current) {
         inputRef.current.blur();
       }
-    }
-  }, [matches, activeIndex, handleSelect]);
+    },
+    [onAddLocation],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && matches.length > 0) {
+        e.preventDefault();
+        handleSelect(matches[activeIndex]);
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex((prev) => Math.min(prev + 1, matches.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.key === 'Escape') {
+        setIsFocused(false);
+        if (inputRef.current) {
+          inputRef.current.blur();
+        }
+      }
+    },
+    [matches, activeIndex, handleSelect],
+  );
 
   // Debounce search term
   useEffect(() => {
@@ -172,11 +186,14 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     setTimeout(() => setIsFocused(false), 100);
   }, []);
 
-  const handleOptionClick = useCallback((entry: any) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleSelect(entry);
-  }, [handleSelect]);
+  const handleOptionClick = useCallback(
+    (entry: any) => (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSelect(entry);
+    },
+    [handleSelect],
+  );
 
   const handleOptionMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -190,7 +207,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
       setDropdownPos({
         left: rect.left,
         top: rect.bottom + window.scrollY,
-        width: rect.width
+        width: rect.width,
       });
     }
   }, [isFocused]);
@@ -247,7 +264,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                   value={searchTerm}
                 />
               </div>
-
             </div>
           </div>
         </td>
@@ -295,16 +311,12 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               </span>
             </div>
             <div className="flex items-center text-[10px] sm:text-xs text-gray-500 whitespace-nowrap overflow-ellipsis overflow-hidden max-w-[200px] sm:max-w-[220px]">
-              <span className="truncate max-w-70 sm:max-w-[140px]">
-                {homeCity.country}
-              </span>
-              <span className="ml-1 sm:ml-2 text-primary-700 font-bold">
-                Current time
-              </span>
+              <span className="truncate max-w-70 sm:max-w-[140px]">{homeCity.country}</span>
+              <span className="ml-1 sm:ml-2 text-primary-700 font-bold">Current time</span>
             </div>
           </div>
         </div>
-        {isFocused && (
+        {isFocused &&
           ReactDOM.createPortal(
             <div
               id="location-selector-dropdown"
@@ -313,7 +325,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 left: dropdownPos.left,
                 top: dropdownPos.top,
                 width: dropdownPos.width,
-                minWidth: '280px'
+                minWidth: '280px',
               }}
               ref={dropdownRef}
             >
@@ -354,10 +366,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 </div>
               )}
             </div>,
-            document.body
-          )
-        )}
+            document.body,
+          )}
       </td>
     </tr>
   );
-}; 
+};

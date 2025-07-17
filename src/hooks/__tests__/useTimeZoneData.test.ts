@@ -23,11 +23,11 @@ describe('useTimeZoneData', () => {
       result.current.addLocation(newTz);
     });
     expect(result.current.locations.length).toBe(initialCount + 1);
-    const newLoc = result.current.locations.find(l => l.timezone.name === 'Europe/Paris');
+    const newLoc = result.current.locations.find((l) => l.timezone.name === 'Europe/Paris');
     expect(newLoc).toBeDefined();
     act(() => {
       result.current.removeLocation(newLoc!.id);
     });
     expect(result.current.locations.length).toBe(initialCount);
   });
-}); 
+});

@@ -1,10 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx,mdx}",
-    "./pages/**/*.{js,jsx,ts,tsx,mdx}",
-    "./components/**/*.{js,jsx,ts,tsx,mdx}",
-    "./app/**/*.{js,jsx,ts,tsx,mdx}",
+    './src/**/*.{js,jsx,ts,tsx,mdx}',
+    './pages/**/*.{js,jsx,ts,tsx,mdx}',
+    './components/**/*.{js,jsx,ts,tsx,mdx}',
+    './app/**/*.{js,jsx,ts,tsx,mdx}',
   ],
   theme: {
     extend: {
@@ -21,7 +21,6 @@ module.exports = {
           800: '#1e40af',
           900: '#1e3a8a',
         },
-
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -41,13 +40,13 @@ module.exports = {
         },
       },
       borderWidth: {
-        '3': '3px',
+        3: '3px',
       },
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
+        18: '4.5rem',
+        88: '22rem',
       },
     },
   },
   plugins: [],
-} 
+};

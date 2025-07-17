@@ -36,6 +36,6 @@ export function groupByMonth(dates: Date[]): Array<{ month: string; start: numbe
 export function formatDateForDisplay(date: Date): { day: number; weekday: string } {
   return {
     day: date.getDate(),
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
   };
-} 
+}

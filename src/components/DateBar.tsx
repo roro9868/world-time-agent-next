@@ -44,7 +44,11 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
     let didScroll = false;
     function scrollToSelected() {
       if (selectedDayRef.current) {
-        selectedDayRef.current.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+        selectedDayRef.current.scrollIntoView({
+          behavior: 'auto',
+          block: 'nearest',
+          inline: 'center',
+        });
         didScroll = true;
       }
     }
@@ -67,12 +71,12 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
       <div className="flex items-center space-x-1">
         {/* Calendar Icon with hidden native date input */}
         <label className="relative inline-block w-5 h-5 sm:w-6 sm:h-6 p-0 m-0 cursor-pointer">
-                      <Calendar className="block w-full h-full text-gray-500 hover:text-primary-600 cursor-pointer" />
+          <Calendar className="block w-full h-full text-gray-500 hover:text-primary-600 cursor-pointer" />
           <input
             type="date"
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer block"
             value={selectedDate.toISOString().slice(0, 10)}
-            onChange={e => {
+            onChange={(e) => {
               // Fix off-by-one: use the value as local date, not UTC
               const val = e.target.value;
               if (val) {
@@ -90,10 +94,17 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
               // Get the days for this month group
               const groupDays = days.slice(group.start, group.end + 1);
               return (
-                <div key={group.month} className="flex flex-col items-center justify-end" style={{ minWidth: `${groupDays.length * 28}px`, marginRight: i === monthGroups.length - 1 ? 0 : '2px' }}>
+                <div
+                  key={group.month}
+                  className="flex flex-col items-center justify-end"
+                  style={{
+                    minWidth: `${groupDays.length * 28}px`,
+                    marginRight: i === monthGroups.length - 1 ? 0 : '2px',
+                  }}
+                >
                   {/* Month label with underline */}
-                            <div className="w-full border-b-2 border-black flex flex-col items-center mb-0.5">
-            <span className="text-xs sm:text-sm font-bold text-gray-900 select-none">
+                  <div className="w-full border-b-2 border-black flex flex-col items-center mb-0.5">
+                    <span className="text-xs sm:text-sm font-bold text-gray-900 select-none">
                       {group.month}
                     </span>
                   </div>
@@ -117,8 +128,12 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                             ${isWeekendDay && !isSelected ? 'text-green-600' : ''}
                             hover:bg-primary-100`}
                         >
-                          <span className="text-xs sm:text-sm font-bold leading-tight">{dayNumber}</span>
-                          <span className="text-[8px] sm:text-[10px] font-normal leading-none">{weekday}</span>
+                          <span className="text-xs sm:text-sm font-bold leading-tight">
+                            {dayNumber}
+                          </span>
+                          <span className="text-[8px] sm:text-[10px] font-normal leading-none">
+                            {weekday}
+                          </span>
                         </button>
                       );
                     })}
@@ -143,4 +158,4 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
       </div>
     </div>
   );
-}; 
+};

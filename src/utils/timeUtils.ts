@@ -47,31 +47,32 @@ export function generateAlignedTimeSlots(
   homeTimezone: string,
   targetTimezone: string,
   selectedTime?: Date,
-  selectedUtcDate?: Date
+  selectedUtcDate?: Date,
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
   // Start at midnight in the home timezone
   const homeMidnight = new Date(baseDate);
   homeMidnight.setHours(0, 0, 0, 0);
   const utcBase = fromZonedTime(homeMidnight, homeTimezone);
-  
+
   // Determine if this timezone has a 30-minute offset
   const offsetMinutes = getCurrentTimezoneOffset(targetTimezone) * 60;
   const hasHalfHour = Math.abs(offsetMinutes % 60) === 30;
   // CHANGED: increments from 24 to 26 (whole hour), 48 to 52 (half hour)
   const increments = hasHalfHour ? 52 : 26;
-  
+
   for (let i = 0; i < increments; i++) {
     const minutesToAdd = hasHalfHour ? i * 30 : i * 60;
     // The UTC time for this slot (aligned to home city's midnight)
     const utcSlot = new Date(utcBase.getTime() + minutesToAdd * 60 * 1000);
     // Convert to the target city's local time
     const localDate = toZonedTime(utcSlot, targetTimezone);
-    const isCurrent = isToday(localDate) && localDate.getHours() === new Date().getHours() && localDate.getMinutes() === new Date().getMinutes();
+    const isCurrent =
+      isToday(localDate) &&
+      localDate.getHours() === new Date().getHours() &&
+      localDate.getMinutes() === new Date().getMinutes();
     const isWeekendDay = isWeekend(localDate);
-    const isSelected = selectedUtcDate
-      ? utcSlot.getTime() === selectedUtcDate.getTime()
-      : false;
+    const isSelected = selectedUtcDate ? utcSlot.getTime() === selectedUtcDate.getTime() : false;
     // Determine if this is the first slot of a new local day
     let isMidnight = false;
     if (i === 0) {
@@ -112,7 +113,9 @@ export const getCurrentTimezoneAbbr = (timeZone: string): string => {
     if (!abbr || isNumericAbbr(abbr)) {
       // Fallback to numeric offset if abbreviation is missing or numeric
       const offset = moment.tz(now, timeZone).format('Z').replace(':', '');
-      return formatNumericAbbrAsGMT(offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`);
+      return formatNumericAbbrAsGMT(
+        offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`,
+      );
     }
     return abbr;
   } catch (e) {
@@ -127,7 +130,9 @@ export const getTimezoneAbbrForDate = (date: Date, timeZone: string): string => 
     const abbr = moment.tz(date, timeZone).zoneAbbr();
     if (!abbr || isNumericAbbr(abbr)) {
       const offset = moment.tz(date, timeZone).format('Z').replace(':', '');
-      return formatNumericAbbrAsGMT(offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`);
+      return formatNumericAbbrAsGMT(
+        offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`,
+      );
     }
     return abbr;
   } catch (e) {
@@ -220,6 +225,6 @@ export function groupByMonth(dates: Date[]): Array<{ month: string; start: numbe
 export function formatDateForDisplay(date: Date): { day: number; weekday: string } {
   return {
     day: date.getDate(),
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
+    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
   };
-} 
+}

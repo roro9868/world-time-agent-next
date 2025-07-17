@@ -27,4 +27,4 @@ export function getSlotBgColor(hour: number, minute: number): string {
   // Day: 7:00 AM (420 minutes) to 6:59 PM (1139 minutes)
   const isDaytime = totalMinutes >= 420 && totalMinutes < 1140;
   return isDaytime ? 'bg-amber-50' : 'bg-blue-50';
-} 
+}

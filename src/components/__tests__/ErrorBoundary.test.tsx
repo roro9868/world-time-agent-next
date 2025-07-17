@@ -14,7 +14,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <div>Safe Child</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText('Safe Child')).toBeInTheDocument();
   });
@@ -25,10 +25,10 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ProblemChild />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();
     expect(screen.getByText(/reload page/i)).toBeInTheDocument();
     spy.mockRestore();
   });
-}); 
+});

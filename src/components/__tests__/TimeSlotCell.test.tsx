@@ -53,12 +53,7 @@ const offHourSlot: TimeSlot = {
   utc: new Date('2024-01-01T14:30:00Z'),
 };
 
-const mockTimeSlots: TimeSlot[] = [
-  mockTimeSlot,
-  midnightSlot,
-  onHourSlot,
-  offHourSlot,
-];
+const mockTimeSlots: TimeSlot[] = [mockTimeSlot, midnightSlot, onHourSlot, offHourSlot];
 
 const defaultProps = {
   slot: mockTimeSlot,
@@ -86,21 +81,25 @@ describe('TimeSlotCell', () => {
   it('calls onTimeSlotClick when clicked', () => {
     const onTimeSlotClick = jest.fn();
     render(<TimeSlotCell {...defaultProps} onTimeSlotClick={onTimeSlotClick} />);
-    
+
     const button = screen.getByRole('button');
     fireEvent.click(button);
-    
+
     expect(onTimeSlotClick).toHaveBeenCalled();
   });
 
   it('shows date label only at midnight slot', () => {
-    render(<TimeSlotCell {...defaultProps} slot={midnightSlot} colIdx={1} timeSlots={mockTimeSlots} />);
+    render(
+      <TimeSlotCell {...defaultProps} slot={midnightSlot} colIdx={1} timeSlots={mockTimeSlots} />,
+    );
     const expectedDate = formatInTimeZone(midnightSlot.utc, mockTimezone.name, 'MMM d');
     expect(screen.getByText(expectedDate)).toBeInTheDocument();
   });
 
   it('shows date label for first column regardless of time', () => {
-    render(<TimeSlotCell {...defaultProps} slot={mockTimeSlot} colIdx={0} timeSlots={mockTimeSlots} />);
+    render(
+      <TimeSlotCell {...defaultProps} slot={mockTimeSlot} colIdx={0} timeSlots={mockTimeSlots} />,
+    );
     // The first column should always show the date label
     const expectedDate = formatInTimeZone(mockTimeSlot.utc, mockTimezone.name, 'MMM d');
     expect(screen.getByText(expectedDate)).toBeInTheDocument();
@@ -111,9 +110,9 @@ describe('TimeSlotCell', () => {
       ...mockTimeSlot,
       isCurrent: true,
     };
-    
+
     render(<TimeSlotCell {...defaultProps} slot={currentSlot} />);
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveClass('ring-2', 'ring-green-400');
   });
@@ -123,9 +122,9 @@ describe('TimeSlotCell', () => {
       ...mockTimeSlot,
       isSelected: true,
     };
-    
+
     render(<TimeSlotCell {...defaultProps} slot={selectedSlot} />);
-    
+
     const button = screen.getByRole('button');
     // The selected styling depends on the getSlotBgColor function
     expect(button).toHaveClass('hover:bg-primary-100');
@@ -133,7 +132,7 @@ describe('TimeSlotCell', () => {
 
   it('has proper accessibility attributes', () => {
     render(<TimeSlotCell {...defaultProps} />);
-    
+
     const button = screen.getByRole('button');
     expect(button).toHaveAttribute('aria-label');
     expect(button).toHaveAttribute('title');
@@ -143,17 +142,17 @@ describe('TimeSlotCell', () => {
   it('handles keyboard navigation', () => {
     const onTimeSlotClick = jest.fn();
     render(<TimeSlotCell {...defaultProps} onTimeSlotClick={onTimeSlotClick} />);
-    
+
     const button = screen.getByRole('button');
-    
+
     // Focus the button
     button.focus();
     expect(button).toHaveFocus();
-    
+
     // Press Enter to select
     fireEvent.keyDown(button, { key: 'Enter' });
     expect(onTimeSlotClick).toHaveBeenCalled();
-    
+
     // Press Space to select
     fireEvent.keyDown(button, { key: ' ' });
     expect(onTimeSlotClick).toHaveBeenCalledTimes(2);
@@ -177,9 +176,9 @@ describe('TimeSlotCell', () => {
       ...mockTimeSlot,
       isWeekend: true,
     };
-    
+
     render(<TimeSlotCell {...defaultProps} slot={weekendSlot} />);
-    
+
     const button = screen.getByRole('button');
     // Weekend styling would be applied by getSlotBgColor function
     expect(button).toBeInTheDocument();
@@ -187,8 +186,8 @@ describe('TimeSlotCell', () => {
 
   it('handles empty time slots array gracefully', () => {
     render(<TimeSlotCell {...defaultProps} timeSlots={[]} />);
-    
+
     const button = screen.getByRole('button');
     expect(button).toBeInTheDocument();
   });
-}); 
+});

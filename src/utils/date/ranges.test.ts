@@ -24,4 +24,4 @@ describe('ranges', () => {
     expect(typeof formatted.day).toBe('number');
     expect(typeof formatted.weekday).toBe('string');
   });
-}); 
+});
