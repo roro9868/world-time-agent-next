@@ -74,7 +74,7 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
       {/* Calendar Popover with shadcn/ui styling */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button size="icon" className="w-12 h-12 p-0 bg-white hover:bg-gray-100 focus:bg-gray-100 transition-all duration-200 border-none shadow-none outline-none [&_svg]:!size-10">
+          <Button size="icon" className="w-12 h-12 p-0 bg-white hover:bg-gray-100 focus:bg-gray-100 transition-all duration-200 border-none shadow-none outline-none [&_svg]:!size-8">
             <Calendar size={32} className="text-gray-700" />
           </Button>
         </PopoverTrigger>
@@ -115,12 +115,12 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                   marginRight: i === monthGroups.length - 1 ? 0 : '4px',
                 }}
               >
-                {/* Month label with underline */}
-                <div className="w-full border-b-2 border-gray-300 flex flex-col items-center mb-1">
-                  <span className="text-xs sm:text-sm font-semibold text-gray-700 select-none tracking-wide">
-                    {group.month}
-                  </span>
-                </div>
+                                  {/* Month label with underline */}
+                  <div className="w-full border-b-2 border-gray-300 flex flex-col items-center mb-0.5">
+                    <span className="text-xs sm:text-sm font-semibold text-gray-700 select-none tracking-wide">
+                      {group.month}
+                    </span>
+                  </div>
                 {/* Date cells for this month */}
                 <div className="flex w-full">
                   {groupDays.map((day, idx) => {
@@ -132,27 +132,27 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
                     const isLast = idx === groupDays.length - 1 && i === monthGroups.length - 1;
                     return (
-                      <Button
-                        key={group.start + idx}
-                        onClick={() => handleDayClick(day)}
-                        ref={isSelected ? selectedDayRef : undefined}
-                        variant={isSelected ? undefined : isTodayDate ? "outline" : "ghost"}
-                        className={`flex flex-col items-center px-2 py-1.5 rounded-lg transition-all duration-200 min-w-[32px] h-auto${isLast ? '' : ' mr-1'}
-                          ${isSelected 
-                            ? 'bg-blue-600 text-white font-semibold hover:bg-blue-700' 
-                            : isTodayDate 
-                              ? 'border-2 border-blue-400 text-blue-700 font-semibold hover:border-blue-500 bg-blue-50/50' 
-                              : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                          }
-                          ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700' : ''}
-                        `}
-                      >
+                                              <Button
+                          key={group.start + idx}
+                          onClick={() => handleDayClick(day)}
+                          ref={isSelected ? selectedDayRef : undefined}
+                          variant={isSelected ? undefined : isTodayDate ? "outline" : "ghost"}
+                          className={`flex flex-col items-center px-1 py-1 rounded-md transition-all duration-200 min-w-[28px] h-auto${isLast ? '' : ' mr-1'}
+                            ${isSelected 
+                              ? 'bg-blue-600 text-white font-semibold hover:bg-blue-700' 
+                              : isTodayDate 
+                                ? 'border-2 border-blue-400 text-blue-700 font-semibold hover:border-blue-500 bg-blue-50/50' 
+                                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                            }
+                            ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700' : ''}
+                          `}
+                        >
                         <span className="text-xs sm:text-sm font-bold leading-tight">
                           {dayNumber}
                         </span>
-                        <span className="text-[8px] sm:text-[10px] font-medium leading-none mt-0">
-                          {weekday}
-                        </span>
+                                                  <span className="text-[8px] sm:text-[10px] font-medium leading-none -mt-2">
+                            {weekday}
+                          </span>
                       </Button>
                     );
                   })}
