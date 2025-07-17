@@ -1,0 +1,306 @@
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { Location, TimeZone } from '../types';
+import { generateAlignedTimeSlots } from '../utils/timeUtils';
+import { getCurrentTimeInZone } from '../utils/time/calculations';
+import cityTimezones from 'city-timezones';
+import { toZonedTime } from 'date-fns-tz';
+
+interface UseTimeZoneDataReturn {
+  locations: Location[];
+  selectedTime: Date;
+  selectedUtcDate: Date | null;
+  anchorDate: Date;
+  homeTimezone: string;
+  addLocation: (timezone: TimeZone) => void;
+  removeLocation: (id: string) => void;
+  setSelectedTime: (time: Date) => void;
+  setSelectedUtcDate: (date: Date | null) => void;
+  setAnchorDate: (date: Date) => void;
+  updateLocations: (locations: Location[]) => void;
+  setHomeTimezone: (timezoneName: string) => void;
+}
+
+// Minimal normalization for United States
+function normalizeCountryName(country: string): string {
+  return country === 'United States of America' ? 'United States' : country;
+}
+
+export const useTimeZoneData = (): UseTimeZoneDataReturn => {
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedTime, setSelectedTime] = useState<Date>(new Date());
+  const [selectedUtcDate, setSelectedUtcDate] = useState<Date | null>(null);
+  const [anchorDate, setAnchorDate] = useState<Date>(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  });
+
+  // Memoize homeTimezone for performance
+  const homeTimezone = useMemo(
+    () => locations[0]?.timezone.name || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    [locations]
+  );
+
+  // Helper to get a Date object for midnight in the home timezone (timezone-aware, robust polyfill for zonedTimeToUtc)
+  const getHomeMidnightDate = useCallback((date: Date, homeTimezone: string) => {
+    const zoned = toZonedTime(date, homeTimezone);
+    const year = zoned.getFullYear();
+    const month = zoned.getMonth();
+    const day = zoned.getDate();
+    const utcMidnight = new Date(Date.UTC(year, month, day, 0, 0, 0));
+    const offsetMinutes = -toZonedTime(utcMidnight, homeTimezone).getTimezoneOffset();
+    return new Date(utcMidnight.getTime() - offsetMinutes * 60 * 1000);
+  }, []);
+
+  // Initialize default locations
+  useEffect(() => {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    // Define default cities by timezone and city name
+    const defaultCityKeys = [
+      { timezone: 'America/New_York', city: 'New York' },
+      { timezone: 'Europe/London', city: 'London' },
+      { timezone: 'Asia/Tokyo', city: 'Tokyo' },
+      { timezone: 'Asia/Shanghai', city: 'Shanghai' },
+      { timezone: 'America/Los_Angeles', city: 'Los Angeles' },
+      { timezone: 'Europe/Istanbul', city: 'Istanbul' },
+      { timezone: 'Asia/Kolkata', city: 'Mumbai' },
+    ];
+
+    const baseTime = getHomeMidnightDate(new Date(), userTimezone);
+    const homeSlots = generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, baseTime);
+    const initialUtc = homeSlots[0].utc;
+
+    // Helper function to get flag emoji from country code
+    const countryCodeToFlagEmoji = (countryCode: string): string => {
+      if (!countryCode || countryCode.length !== 2) return '🌍';
+      try {
+        const codePoints = countryCode
+          .toUpperCase()
+          .split('')
+          .map(char => 127397 + char.charCodeAt(0));
+        return String.fromCodePoint(...codePoints);
+      } catch {
+        return '🌍';
+      }
+    };
+
+    // Helper function to calculate timezone offset
+    const getTimezoneOffset = (timezone: string): number => {
+      const now = new Date();
+      const utcHour = now.getUTCHours();
+      const utcMinute = now.getUTCMinutes();
+      const localTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+      const hour = localTime.getHours();
+      const minute = localTime.getMinutes();
+      return (hour - utcHour) + (minute - utcMinute) / 60;
+    };
+
+    // Get default locations from city-timezones library
+    const defaultLocations = defaultCityKeys
+      .filter(dc => dc.timezone !== userTimezone)
+      .map(dc => {
+        // Find the city in the city-timezones library
+        const cityInfo = Object.values(cityTimezones.cityMapping).find((info: any) => 
+          info.timezone === dc.timezone && info.city === dc.city
+        );
+        
+        if (!cityInfo) {
+          console.warn(`City not found in library: ${dc.city}, ${dc.timezone}`);
+          return null;
+        }
+
+        const city: TimeZone = {
+          name: cityInfo.timezone,
+          city: cityInfo.city,
+          country: normalizeCountryName(cityInfo.country), // Use library's country name directly
+          offset: getTimezoneOffset(cityInfo.timezone),
+          flag: countryCodeToFlagEmoji(cityInfo.iso2)
+        };
+        
+        return {
+          id: city.name + ':' + city.city,
+          timezone: city,
+          currentTime: getCurrentTimeInZone(city.name),
+          timeSlots: generateAlignedTimeSlots(baseTime, userTimezone, city.name, baseTime, initialUtc),
+        };
+      })
+      .filter(Boolean) as Location[]; // Remove any null entries
+
+    // Find local timezone info with priority for major cities
+    const priorityCities = {
+      'America/New_York': 'New York',
+      'America/Los_Angeles': 'Los Angeles',
+      'America/Chicago': 'Chicago',
+      'America/Denver': 'Denver',
+      'America/Phoenix': 'Phoenix',
+      'America/Anchorage': 'Anchorage',
+      'America/Honolulu': 'Honolulu',
+      'Europe/London': 'London',
+      'Europe/Paris': 'Paris',
+      'Europe/Berlin': 'Berlin',
+      'Europe/Rome': 'Rome',
+      'Europe/Madrid': 'Madrid',
+      'Europe/Amsterdam': 'Amsterdam',
+      'Europe/Brussels': 'Brussels',
+      'Europe/Vienna': 'Vienna',
+      'Europe/Zurich': 'Zurich',
+      'Europe/Stockholm': 'Stockholm',
+      'Europe/Oslo': 'Oslo',
+      'Europe/Copenhagen': 'Copenhagen',
+      'Europe/Helsinki': 'Helsinki',
+      'Europe/Warsaw': 'Warsaw',
+      'Europe/Prague': 'Prague',
+      'Europe/Budapest': 'Budapest',
+      'Europe/Athens': 'Athens',
+      'Europe/Istanbul': 'Istanbul',
+      'Europe/Moscow': 'Moscow',
+      'Asia/Tokyo': 'Tokyo',
+      'Asia/Shanghai': 'Shanghai',
+      'Asia/Seoul': 'Seoul',
+      'Asia/Beijing': 'Beijing',
+      'Asia/Hong_Kong': 'Hong Kong',
+      'Asia/Singapore': 'Singapore',
+      'Asia/Bangkok': 'Bangkok',
+      'Asia/Manila': 'Manila',
+      'Asia/Jakarta': 'Jakarta',
+      'Asia/Kolkata': 'Mumbai',
+      'Asia/Dhaka': 'Dhaka',
+      'Asia/Karachi': 'Karachi',
+      'Asia/Dubai': 'Dubai',
+      'Asia/Tel_Aviv': 'Tel Aviv',
+      'Asia/Riyadh': 'Riyadh',
+      'Asia/Baghdad': 'Baghdad',
+      'Asia/Tehran': 'Tehran',
+      'Australia/Sydney': 'Sydney',
+      'Australia/Melbourne': 'Melbourne',
+      'Australia/Brisbane': 'Brisbane',
+      'Australia/Perth': 'Perth',
+      'Australia/Adelaide': 'Adelaide',
+      'Pacific/Auckland': 'Auckland',
+      'Pacific/Fiji': 'Suva',
+    };
+
+    let localCityInfo = Object.values(cityTimezones.cityMapping).find((info: any) => 
+      info.timezone === userTimezone && info.city === priorityCities[userTimezone as keyof typeof priorityCities]
+    );
+    
+    // If not a priority city, default to New York
+    if (!localCityInfo) {
+      localCityInfo = Object.values(cityTimezones.cityMapping).find((info: any) => 
+        info.timezone === 'America/New_York' && info.city === 'New York'
+      );
+    }
+    
+    const localTimezone: TimeZone = localCityInfo ? {
+      name: localCityInfo.timezone,
+      city: localCityInfo.city,
+      country: normalizeCountryName(localCityInfo.country),
+      offset: getTimezoneOffset(userTimezone),
+      flag: countryCodeToFlagEmoji(localCityInfo.iso2)
+    } : {
+      name: userTimezone,
+      city: 'New York', // Default to New York if no city found
+      country: 'United States',
+      offset: getTimezoneOffset(userTimezone),
+      flag: '🇺🇸',
+    };
+
+    const initialLocation: Location = {
+      id: 'local',
+      timezone: localTimezone,
+      currentTime: getCurrentTimeInZone(userTimezone),
+      timeSlots: generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, baseTime, initialUtc),
+    };
+
+    setLocations([initialLocation, ...defaultLocations]);
+    setSelectedTime(baseTime);
+    setAnchorDate(baseTime);
+    setSelectedUtcDate(initialUtc);
+  }, [getHomeMidnightDate]);
+
+  // Update currentTime for all locations every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLocations(prev => prev.map(location => ({
+        ...location,
+        currentTime: getCurrentTimeInZone(location.timezone.name)
+      })));
+    }, 60 * 1000);
+
+    // Also update immediately on mount
+    setLocations(prev => prev.map(location => ({
+      ...location,
+      currentTime: getCurrentTimeInZone(location.timezone.name)
+    })));
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const addLocation = useCallback((timezone: TimeZone) => {
+    setLocations(prev => {
+      if (prev.some(location => 
+        location.timezone.name === timezone.name && 
+        location.timezone.city === timezone.city
+      )) {
+        return prev; // Don't add if already exists
+      }
+      const currentUtcDate = selectedUtcDate || new Date();
+      return [
+        ...prev,
+        {
+          id: `${timezone.name}:${timezone.city}`,
+          timezone,
+          currentTime: getCurrentTimeInZone(timezone.name),
+          timeSlots: generateAlignedTimeSlots(selectedTime, homeTimezone, timezone.name, selectedTime, currentUtcDate)
+        }
+      ];
+    });
+  }, [selectedTime, selectedUtcDate, homeTimezone]);
+
+  const removeLocation = useCallback((id: string) => {
+    setLocations(prev => prev.filter(location => location.id !== id));
+  }, []);
+
+  const updateLocations = useCallback((newLocations: Location[]) => {
+    setLocations(newLocations);
+  }, []);
+
+  // Set the home timezone by moving the specified location to the front
+  const setHomeTimezone = useCallback((timezoneName: string) => {
+    setLocations(prev => {
+      const idx = prev.findIndex(loc => loc.timezone.name === timezoneName);
+      if (idx <= 0) return prev; // Already first or not found
+      const newLocations = [...prev];
+      const [homeLoc] = newLocations.splice(idx, 1);
+      newLocations.unshift(homeLoc);
+      return newLocations;
+    });
+  }, []);
+
+  // Update the setSelectedTime and setSelectedUtcDate handlers
+  const handleSetSelectedTime = useCallback((time: Date) => {
+    // Store the time directly without any conversion
+    setSelectedTime(time);
+  }, []);
+
+  const handleSetSelectedUtcDate = useCallback((date: Date | null) => {
+    // Store the UTC date directly without any conversion
+    setSelectedUtcDate(date);
+  }, []);
+
+  return {
+    locations,
+    selectedTime,
+    selectedUtcDate,
+    anchorDate,
+    homeTimezone,
+    addLocation,
+    removeLocation,
+    setSelectedTime: handleSetSelectedTime,
+    setSelectedUtcDate: handleSetSelectedUtcDate,
+    setAnchorDate,
+    updateLocations,
+    setHomeTimezone,
+  };
+};
