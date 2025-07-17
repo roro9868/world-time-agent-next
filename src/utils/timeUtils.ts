@@ -191,40 +191,45 @@ export function isSlotMidnight(slot: { hour: number; minute: number }): boolean 
 export function generateDateRange(startDate: Date, count: number): Date[] {
   const dates: Date[] = [];
   for (let i = 0; i < count; i++) {
-    const date = new Date(startDate);
-    date.setDate(startDate.getDate() + i);
+    const date = new Date(Date.UTC(
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth(),
+      startDate.getUTCDate() + i,
+    ));
     dates.push(date);
   }
   return dates;
 }
 
 export function groupByMonth(dates: Date[]): Array<{ month: string; start: number; end: number }> {
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const groups: Array<{ month: string; start: number; end: number }> = [];
-  let currentMonth = '';
+  let currentMonthIdx = -1;
   let startIndex = 0;
 
   dates.forEach((date, index) => {
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    if (month !== currentMonth) {
-      if (currentMonth) {
-        groups.push({ month: currentMonth, start: startIndex, end: index - 1 });
+    const monthIdx = date.getUTCMonth();
+    if (monthIdx !== currentMonthIdx) {
+      if (currentMonthIdx !== -1) {
+        groups.push({ month: MONTHS[currentMonthIdx], start: startIndex, end: index - 1 });
       }
-      currentMonth = month;
+      currentMonthIdx = monthIdx;
       startIndex = index;
     }
   });
 
   // Add the last group
-  if (currentMonth) {
-    groups.push({ month: currentMonth, start: startIndex, end: dates.length - 1 });
+  if (currentMonthIdx !== -1) {
+    groups.push({ month: MONTHS[currentMonthIdx], start: startIndex, end: dates.length - 1 });
   }
 
   return groups;
 }
 
 export function formatDateForDisplay(date: Date): { day: number; weekday: string } {
+  const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   return {
-    day: date.getDate(),
-    weekday: date.toLocaleDateString('en-US', { weekday: 'short' }),
+    day: date.getUTCDate(),
+    weekday: WEEKDAYS[date.getUTCDay()],
   };
 }

@@ -98,23 +98,27 @@ describe('timeUtils', () => {
 
   describe('generateDateRange', () => {
     it('generates correct date range', () => {
-      const startDate = new Date('2023-01-01');
+      const startDate = new Date(Date.UTC(2023, 0, 1));
       const dates = generateDateRange(startDate, 5);
 
       expect(dates).toHaveLength(5);
-      expect(dates[0].toDateString()).toBe('Sun Jan 01 2023');
-      expect(dates[4].toDateString()).toBe('Thu Jan 05 2023');
+      expect(dates[0].getUTCFullYear()).toBe(2023);
+      expect(dates[0].getUTCMonth()).toBe(0);
+      expect(dates[0].getUTCDate()).toBe(1);
+      expect(dates[4].getUTCFullYear()).toBe(2023);
+      expect(dates[4].getUTCMonth()).toBe(0);
+      expect(dates[4].getUTCDate()).toBe(5);
     });
   });
 
   describe('groupByMonth', () => {
     it('groups dates by month correctly', () => {
       const dates = [
-        new Date('2023-01-01'),
-        new Date('2023-01-15'),
-        new Date('2023-02-01'),
-        new Date('2023-02-15'),
-        new Date('2023-03-01'),
+        new Date(Date.UTC(2023, 0, 1)),
+        new Date(Date.UTC(2023, 0, 15)),
+        new Date(Date.UTC(2023, 1, 1)),
+        new Date(Date.UTC(2023, 1, 15)),
+        new Date(Date.UTC(2023, 2, 1)),
       ];
 
       const groups = groupByMonth(dates);
@@ -134,9 +138,10 @@ describe('timeUtils', () => {
 
   describe('formatDateForDisplay', () => {
     it('formats date for display correctly', () => {
-      const result = formatDateForDisplay(new Date('2023-01-15'));
+      const date = new Date(Date.UTC(2023, 0, 15));
+      const result = formatDateForDisplay(date);
 
-      expect(result).toHaveProperty('day', 15);
+      expect(result).toHaveProperty('day', date.getUTCDate());
       expect(result).toHaveProperty('weekday');
       expect(typeof result.weekday).toBe('string');
     });
