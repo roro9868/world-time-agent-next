@@ -6,10 +6,10 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { generateAlignedTimeSlots } from '../utils/timeUtils';
+import { Button } from './components/ui/button';
 
 interface TimeZoneRowProps {
   location: Location;
-  selectedTime: Date;
   onTimeSlotClick: (colIdx: number, utc: Date, localDate: Date, timezoneName: string) => void;
   onRemove: (id: string) => void;
   isHome?: boolean;
@@ -22,17 +22,16 @@ interface TimeZoneRowProps {
 const TimeZoneHeaderCell: React.FC<{
   location: Location;
   isHome: boolean;
-  selectedTime: Date;
   homeTimezone: string;
   onRemove: (id: string) => void;
   dragHandleProps?: any;
-}> = React.memo(({ location, isHome, selectedTime, homeTimezone, onRemove, dragHandleProps }) => (
+}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps }) => (
   <td
     className={`sticky left-0 z-20 px-1.5 sm:px-3 py-1.5 sm:py-2.5 align-top border-r border-gray-100 min-w-[100px] max-w-[220px] w-auto whitespace-nowrap truncate transition-colors group-hover:bg-primary-50 ${isHome ? 'bg-gray-100' : 'bg-white'}`}
   >
     <div className="flex items-start space-x-1 sm:space-x-2">
       {/* Drag Handle */}
-      <button
+      <Button
         {...dragHandleProps}
         className="cursor-grab active:cursor-grabbing p-0.5 sm:p-1 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 touch-none"
         title="Drag to reorder"
@@ -42,9 +41,11 @@ const TimeZoneHeaderCell: React.FC<{
           e.stopPropagation();
           dragHandleProps.onMouseDown?.(e);
         }}
+        variant="ghost"
+        size="icon"
       >
         <GripVertical className="w-3 sm:w-4 h-3 sm:h-4" />
-      </button>
+      </Button>
       <span
         className="text-lg sm:text-xl flex-shrink-0"
         role="img"
@@ -59,13 +60,15 @@ const TimeZoneHeaderCell: React.FC<{
             {location.timezone.city}
           </span>
           <span className="ml-1 sm:ml-2 px-0.5 sm:px-1 py-0.5 rounded bg-gray-100 text-[8px] sm:text-[10px] font-semibold text-gray-500 align-middle whitespace-nowrap flex-shrink-0">
-            {getTimezoneAbbrForDate(selectedTime, location.timezone.name)}
+            {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          <button
+          <Button
             onClick={() => onRemove(location.id)}
             className="ml-1 sm:ml-2 p-0.5 sm:p-1 text-gray-400 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
             title="Remove location"
             aria-label={`Remove ${location.timezone.city} from list`}
+            variant="ghost"
+            size="icon"
           >
             <svg
               className="w-3 sm:w-4 h-3 sm:h-4"
@@ -81,7 +84,7 @@ const TimeZoneHeaderCell: React.FC<{
                 d="M6 18L18 6M6 6l12 12"
               />
             </svg>
-          </button>
+          </Button>
         </div>
         {/* Second row: country + current time */}
         <div className="flex items-center text-[10px] sm:text-xs text-gray-500 whitespace-nowrap overflow-hidden">
@@ -100,7 +103,6 @@ const TimeZoneHeaderCell: React.FC<{
 const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
   ({
     location,
-    selectedTime,
     onTimeSlotClick,
     onRemove,
     isHome = false,
@@ -147,7 +149,6 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         <TimeZoneHeaderCell
           location={location}
           isHome={!!isHomeRow}
-          selectedTime={selectedTime}
           homeTimezone={homeTimezone || ''}
           onRemove={onRemove}
           dragHandleProps={listeners}
@@ -161,7 +162,6 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
             timeSlots={timeSlots}
             timezone={timezone}
             onTimeSlotClick={() => onTimeSlotClick(colIdx, slot.utc, slot.date, timezone.name)}
-            selectedTime={selectedTime}
           />
         ))}
       </tr>

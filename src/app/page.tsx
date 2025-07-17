@@ -289,7 +289,6 @@ export default function Home() {
                             <TimeZoneRow
                               key={location.id}
                               location={location}
-                              selectedTime={selectedTime}
                               onTimeSlotClick={memoizedHandleTimeSlotClick}
                               onRemove={memoizedRemoveLocation}
                               isHome={rowIdx === 0}
