@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useCallback, useLayoutEffect, useState, useEffect } from 'react';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { Globe, Clock } from 'lucide-react';
 import { LocationSelector } from '@/components/LocationSelector';
 import type { Location } from '@/types';
@@ -42,12 +42,6 @@ export default function Home() {
   }, [locations]);
 
   const tableRef = useRef<HTMLDivElement>(null);
-  const [overlayStyle, setOverlayStyle] = useState<{
-    left: number;
-    width: number;
-    top: number;
-    height: number;
-  } | null>(null);
 
   const getHomeMidnightDate = useCallback((date: Date, homeTimezone: string) => {
     const zoned = toZonedTime(date, homeTimezone);
@@ -87,64 +81,6 @@ export default function Home() {
     }
   }, [selectedUtcDate, anchorDate, homeTimezone, locations, updateLocations, getHomeMidnightDate]);
 
-  useLayoutEffect(() => {
-    let rafId: number | null = null;
-    function calculateOverlay() {
-      if (!tableRef.current || !selectedUtcDate || locations.length === 0) {
-        setOverlayStyle(null);
-        return;
-      }
-      const table = tableRef.current.querySelector('table');
-      if (!table) return;
-      const bodyRows = table.querySelectorAll('tbody tr');
-      if (bodyRows.length < 2) return;
-      const firstRow = bodyRows[0];
-      const lastCityRow = bodyRows[bodyRows.length - 2];
-      const cells = firstRow.querySelectorAll('td');
-      if (!cells.length) return;
-      let colIdx = -1;
-      if (locations.length > 0) {
-        const firstLocation = locations[0];
-        const timeSlots = generateAlignedTimeSlots(
-          anchorDate,
-          homeTimezone,
-          firstLocation.timezone.name,
-          anchorDate,
-          selectedUtcDate,
-        );
-        colIdx = timeSlots.findIndex((slot) => slot.utc.getTime() === selectedUtcDate.getTime());
-      }
-      if (colIdx === -1) {
-        setOverlayStyle(null);
-        return;
-      }
-      const cell = cells[colIdx + 1];
-      if (!cell) return;
-      const cellRect = (cell as HTMLElement).getBoundingClientRect();
-      const parentRect = tableRef.current.getBoundingClientRect();
-      const firstRowRect = firstRow.getBoundingClientRect();
-      const lastCityCells = lastCityRow.querySelectorAll('td');
-      const lastCell = lastCityCells[colIdx + 1];
-      if (!lastCell) return;
-      const lastCellRect = (lastCell as HTMLElement).getBoundingClientRect();
-      let overlayTop = firstRowRect.top - parentRect.top;
-      let overlayHeight = lastCellRect.bottom - firstRowRect.top;
-      if (overlayHeight < 0) overlayHeight = 0;
-      setOverlayStyle({
-        left: cellRect.left - parentRect.left,
-        width: cellRect.width - 1,
-        top: overlayTop,
-        height: overlayHeight,
-      });
-    }
-    rafId = window.requestAnimationFrame(calculateOverlay);
-    return () => {
-      if (rafId !== null) {
-        window.cancelAnimationFrame(rafId);
-      }
-    };
-  }, [selectedUtcDate, locations, anchorDate, homeTimezone]);
-
   const normalizeLocationIds = useCallback((locations: Location[]): Location[] => {
     return locations.map((loc, idx) => ({
       ...loc,
@@ -174,7 +110,7 @@ export default function Home() {
   );
 
   const handleTimeSlotClick = useCallback(
-    (colIdx: number, slotUtc: Date, slotLocal: Date, slotTimezone: string) => {
+    (colIdx: number, slotUtc: Date, _slotLocal: Date, _slotTimezone: string) => {
       setSelectedUtcDate(slotUtc);
       setSelectedTime(slotUtc);
       const dateStr = formatInTimeZone(slotUtc, homeTimezone, 'yyyy-MM-dd');
@@ -212,6 +148,22 @@ export default function Home() {
   const memoizedRemoveLocation = useCallback(removeLocation, [removeLocation]);
   const memoizedAddLocation = useCallback(addLocation, [addLocation]);
 
+  const handleShareLink = useCallback(() => {
+    const url = new URL(window.location.href);
+    // Add current state to URL params
+    url.searchParams.set('cities', locations.map(l => `${l.timezone.name}:${l.timezone.city}`).join(','));
+    url.searchParams.set('date', selectedTime.toISOString());
+    url.searchParams.set('home', homeTimezone);
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      // Simple success feedback - you could add a toast here
+      console.log('Share link copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy share link:', err);
+    });
+  }, [locations, selectedTime, homeTimezone]);
+
   if (!hasInitialized && (!locations || locations.length === 0)) {
     return <div style={{ color: 'gray', textAlign: 'center', marginTop: 40 }}>Loading...</div>;
   }
@@ -226,10 +178,10 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background transition-colors duration-300">
-        <div className="container mx-auto px-2 xs:px-4 py-4 xs:py-6 sm:py-8 max-w-7xl">
+        <div className="w-full">
           {/* Header */}
-          <div className="w-full bg-slate-800 text-white shadow-lg mb-0 -mx-2 xs:-mx-4 -mt-4 xs:-mt-6 sm:-mt-8 mb-6">
-            <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="w-full bg-slate-800 text-white shadow-lg mb-6">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-7xl">
               <div className="flex items-center gap-3">
                 <div className="relative flex items-center justify-center">
                   <Globe className="h-6 w-6 text-teal-400" />
@@ -247,34 +199,10 @@ export default function Home() {
             </div>
           </div>
           
-          {/* DateBar */}
-          <div className="mb-6 flex justify-center">
-            <div className="w-full max-w-4xl bg-card border rounded-lg shadow-sm p-4">
-              <DateBar
-                selectedDate={selectedTime}
-                onDateChange={handleDateChange}
-                homeTimezone={homeTimezone}
-              />
-            </div>
-          </div>
-          
           {/* Time Zone Table Layout */}
-          <div className="flex justify-center">
-            <div className="w-full max-w-6xl bg-card border rounded-lg shadow-sm relative overflow-hidden">
+          <div className="container mx-auto px-2 xs:px-4 max-w-7xl">
+            <div className="w-full bg-card border rounded-lg shadow-sm relative overflow-hidden">
               <div ref={tableRef}>
-                {/* Overlay for selected time column */}
-                {overlayStyle && (
-                  <div
-                    className="absolute pointer-events-none z-20 border-2 border-black bg-transparent"
-                    style={{
-                      left: overlayStyle.left,
-                      width: overlayStyle.width,
-                      top: overlayStyle.top,
-                      height: overlayStyle.height,
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                )}
                 <DndContext
                   key={locations.map((l) => l.id).join(',')}
                   sensors={sensors}
@@ -288,6 +216,24 @@ export default function Home() {
                     <div className="overflow-x-auto w-full touch-pan-x">
                       <table className="w-full border-separate border-spacing-0 min-w-[900px] sm:min-w-[1100px] lg:min-w-[1300px]">
                         <tbody>
+                          {/* DateBar Header Row */}
+                          <tr className="border-b border-border bg-muted/30">
+                            <td className="sticky left-0 z-10 bg-muted/30 px-1 xs:px-2 py-3 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
+                              <div className="flex items-center justify-center">
+                                <span className="text-xs font-medium text-muted-foreground"></span>
+                              </div>
+                            </td>
+                            <td className="px-0 py-3" colSpan={26}>
+                              <div className="flex justify-center">
+                                <DateBar
+                                  selectedDate={selectedTime}
+                                  onDateChange={handleDateChange}
+                                  homeTimezone={homeTimezone}
+                                  onShareLink={handleShareLink}
+                                />
+                              </div>
+                            </td>
+                          </tr>
                           {locations.map((location, rowIdx) => (
                             <TimeZoneRow
                               key={location.id}
@@ -312,19 +258,19 @@ export default function Home() {
                 </DndContext>
               </div>
             </div>
-          </div>
-          {/* Empty State */}
-          {locations.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12 animate-fade-in">
-              <div className="bg-muted/50 rounded-full p-4 mb-4">
-                <Clock className="h-12 w-12 text-muted-foreground" />
+            {/* Empty State */}
+            {locations.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-12 animate-fade-in">
+                <div className="bg-muted/50 rounded-full p-4 mb-4">
+                  <Clock className="h-12 w-12 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">No locations added</h3>
+                <p className="text-muted-foreground text-center max-w-sm">
+                  Add your first location to start tracking time across different timezones
+                </p>
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">No locations added</h3>
-              <p className="text-muted-foreground text-center max-w-sm">
-                Add your first location to start tracking time across different timezones
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </ErrorBoundary>

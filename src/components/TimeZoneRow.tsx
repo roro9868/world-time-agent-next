@@ -25,19 +25,22 @@ const TimeZoneHeaderCell: React.FC<{
   isHome: boolean;
   homeTimezone: string;
   onRemove: (id: string) => void;
-  dragHandleProps?: any;
+  dragHandleProps?: {
+    onMouseDown?: (e: React.MouseEvent) => void;
+  };
   totalLocations: number;
-}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps, totalLocations }) => (
+}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps, totalLocations }) => {
+  return (
   <td
-    className={`sticky left-0 z-20 px-2 xs:px-3 py-2 xs:py-3 align-top border-r border-border min-w-[120px] xs:min-w-[140px] sm:min-w-[160px] max-w-[120px] xs:max-w-[140px] sm:max-w-[160px] transition-colors group-hover:bg-muted/50 ${
+    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px] transition-colors group-hover:bg-muted/50 ${
       isHome ? 'bg-muted/30' : 'bg-card'
     } overflow-hidden`}
   >
-    <div className="flex items-center gap-1 xs:gap-2">
+    <div className="flex items-center gap-0.5 xs:gap-1">
       {/* Drag Handle */}
       <Button
         {...dragHandleProps}
-        className="cursor-grab active:cursor-grabbing shrink-0 h-5 xs:h-6 w-5 xs:w-6 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
+        className="cursor-grab active:cursor-grabbing shrink-0 h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
         title="Drag to reorder"
         type="button"
         aria-label={`Drag ${location.timezone.city} to reorder`}
@@ -48,7 +51,7 @@ const TimeZoneHeaderCell: React.FC<{
         variant="ghost"
         size="icon"
       >
-        <GripVertical className="h-3 xs:h-4 w-3 xs:w-4" />
+        <GripVertical className="h-3 w-3" />
       </Button>
       <span
         className="text-base xs:text-lg sm:text-xl shrink-0"
@@ -108,8 +111,8 @@ const TimeZoneHeaderCell: React.FC<{
         </div>
         {/* Second row: country + current time */}
         <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1">
-          <span className="truncate max-w-[70px] xs:max-w-[90px] sm:max-w-[110px]">
-            {location.timezone.country}
+          <span className="truncate max-w-[60px] xs:max-w-[70px] sm:max-w-[80px]" title={location.timezone.country}>
+            {location.timezone.country.length > 12 ? location.timezone.country.substring(0, 12) + '...' : location.timezone.country}
           </span>
           <span className="ml-1 xs:ml-2 text-slate-700 font-semibold shrink-0 text-[10px] xs:text-xs">
             {formatCurrentTimeInZone(location.timezone.name)}
@@ -118,7 +121,10 @@ const TimeZoneHeaderCell: React.FC<{
       </div>
     </div>
   </td>
-));
+  );
+});
+
+TimeZoneHeaderCell.displayName = 'TimeZoneHeaderCell';
 
 const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
   ({
@@ -190,5 +196,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     );
   },
 );
+
+TimeZoneRow.displayName = 'TimeZoneRow';
 
 export default React.memo(TimeZoneRow);

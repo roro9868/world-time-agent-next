@@ -187,7 +187,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, []);
 
   const handleOptionClick = useCallback(
-    (entry: any) => (e: React.MouseEvent) => {
+    (entry: SearchTimeZone) => (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       handleSelect(entry);
@@ -273,20 +273,11 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   return (
     <tr className="border-b border-border">
-      <td className="sticky left-0 z-10 bg-card px-2 xs:px-3 py-2 xs:py-3 align-top border-r border-border min-w-[120px] xs:min-w-[140px] sm:min-w-[160px] max-w-[120px] xs:max-w-[140px] sm:max-w-[160px]">
-        <div className="flex items-center gap-1 xs:gap-2 w-full h-full py-1">
-          <button
-            aria-hidden="true"
-            className="cursor-not-allowed shrink-0 h-5 xs:h-6 w-5 xs:w-6 p-0 text-muted-foreground opacity-30"
-            disabled
-            style={{ pointerEvents: 'none' }}
-            tabIndex={-1}
-            title="Drag handle (disabled)"
-            type="button"
-          >
-            <GripVertical className="h-3 xs:h-4 w-3 xs:w-4" />
-          </button>
-          <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+              <td className="sticky left-0 z-10 bg-card px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
+        <div className="flex items-center gap-0.5 xs:gap-1 w-full h-full py-1">
+          <div className="shrink-0 h-5 xs:h-6 w-5 xs:w-6 flex items-center justify-center">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+          </div>
           <div className="flex items-center min-w-0 flex-1 gap-1">
             <input
               aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
@@ -305,9 +296,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               onKeyDown={handleKeyDown}
               ref={inputRef}
             />
-            <span className="px-1 py-0.5 rounded bg-teal-100 text-teal-700 text-[8px] font-medium whitespace-nowrap shrink-0">
-              ADD
-            </span>
           </div>
         </div>
         {isFocused &&

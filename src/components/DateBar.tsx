@@ -8,6 +8,7 @@ interface DateBarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
   homeTimezone: string;
+  onShareLink?: () => void;
 }
 
 // Helper to get a Date object for midnight in the home timezone
@@ -30,7 +31,7 @@ function isTodayInHomeTimezone(date: Date, homeTimezone: string): boolean {
   return isSameDateInHomeTimezone(date, today, homeTimezone);
 }
 
-export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, homeTimezone }) => {
+export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, homeTimezone, onShareLink }) => {
   const selectedDayRef = useRef<HTMLButtonElement>(null);
 
   // Calculate the start of the day in the home timezone
@@ -75,7 +76,7 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
   }, [selectedDate, days.length]);
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className="flex items-center justify-between w-full gap-4">
       {/* Month groups with date cells */}
       <div className="flex-1 min-w-0 max-w-fit overflow-x-auto">
         <div className="flex gap-1 w-fit">
@@ -133,6 +134,19 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
           })}
         </div>
       </div>
+      {/* Share Link Button */}
+      {onShareLink && (
+        <div className="shrink-0">
+          <Button
+            onClick={onShareLink}
+            variant="outline"
+            size="sm"
+            className="text-xs"
+          >
+            Share Link
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

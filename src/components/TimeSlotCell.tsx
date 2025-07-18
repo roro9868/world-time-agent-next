@@ -1,7 +1,7 @@
 import React from 'react';
 import type { TimeSlot, TimeZone } from '../types';
 import { formatInTimeZone } from 'date-fns-tz';
-import { getSlotBgColor } from '../utils/timeUtils';
+
 import { Button } from "./ui/button";
 
 interface TimeSlotCellProps {
@@ -31,9 +31,11 @@ const getTimeSlotStyling = (
     };
   }
 
-  // Day/night background colors
+  // Day/night background colors with better visual hierarchy
   const isDaytime = slot.hour >= 7 && slot.hour < 19;
-  const bgClass = isDaytime ? 'bg-amber-50/50 hover:bg-amber-100/70' : 'bg-slate-50/50 hover:bg-slate-100/70';
+  const bgClass = isDaytime 
+    ? 'bg-amber-50/60 hover:bg-amber-100/80 border-amber-100/40' 
+    : 'bg-blue-50/60 hover:bg-blue-100/80 border-blue-100/40';
   
   return {
     className: `${bgClass} hover:bg-accent hover:text-accent-foreground`,
@@ -44,7 +46,6 @@ const getTimeSlotStyling = (
 const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   slot,
   colIdx,
-  timeSlots,
   timezone,
   onTimeSlotClick,
 }) => {
@@ -73,11 +74,13 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
 
   // Always format the slot's time using the UTC base and the target timezone
   const formattedTime = formatInTimeZone(slot.utc, timezone.name, 'h:mm a');
-  let [timeLabel, ampm] = formattedTime.split(' ');
-  // Remove ':00' for on-the-hour slots
-  if (timeLabel.endsWith(':00')) {
-    timeLabel = timeLabel.replace(':00', '');
-  }
+  const [timeLabel, ampm] = formattedTime.split(' ');
+  
+  // Parse hour and minute for better display
+  const hourPart = timeLabel.includes(':') ? timeLabel.split(':')[0] : timeLabel;
+  const minutePart = timeLabel.includes(':') ? timeLabel.split(':')[1] : '00';
+  
+  const isHalfHour = minutePart === '30';
   // Create comprehensive aria-label for accessibility
   const ariaLabel = `${formattedTime} in ${timezone.city}. Click to select this time.`;
 
@@ -114,15 +117,16 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           title={`${formattedTime} - Click to select`}
           tabIndex={0}
         >
-          <span
-            className={
-              timeLabel.includes(':')
-                ? 'text-xs xs:text-sm leading-none font-medium'
-                : 'text-sm xs:text-base leading-none font-bold'
-            }
-          >
-            {timeLabel}
-          </span>
+          <div className="flex items-center justify-center">
+            <span className="text-sm xs:text-base leading-none font-bold">
+              {hourPart}
+            </span>
+            {isHalfHour && (
+              <span className="text-[8px] xs:text-[10px] leading-none font-medium opacity-75">
+                :30
+              </span>
+            )}
+          </div>
           {ampm && (
             <span className="text-[8px] xs:text-[10px] leading-none font-medium opacity-75 uppercase">
               {ampm}
