@@ -224,9 +224,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, [debouncedSearchTerm, matches.length]);
 
   return (
-    <div className="flex items-center gap-1 w-full rounded px-2 py-2">
-      <div className="shrink-0 h-5 w-5 flex items-center justify-center">
-        <MapPin className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-1 w-full rounded px-1 py-1">
+      <div className="shrink-0 h-4 w-4 flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-muted-foreground" />
       </div>
       <div className="flex items-center min-w-0 flex-1">
         <input
@@ -235,7 +235,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           aria-controls="location-selector-dropdown"
           aria-expanded={isFocused}
           aria-label="Search for a city to add"
-          className="flex-1 bg-transparent border border-input rounded px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring min-w-0"
+          className="flex-1 bg-transparent border border-input rounded px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring min-w-0"
           placeholder="Add city..."
           role="combobox"
           type="text"

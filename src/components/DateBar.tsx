@@ -3,7 +3,9 @@ import { toZonedTime } from 'date-fns-tz';
 import { isWeekend } from 'date-fns';
 import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
 import { Button } from "./ui/button";
-import { Calendar } from 'lucide-react';
+import { Calendar, Moon, Sun } from 'lucide-react';
+import { CustomDatePicker } from "./ui/custom-date-picker";
+import { useDarkMode } from '../hooks/useDarkMode';
 
 interface DateBarProps {
   selectedDate: Date;
@@ -34,6 +36,8 @@ function isTodayInHomeTimezone(date: Date, homeTimezone: string): boolean {
 
 export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, homeTimezone, onShareLink }) => {
   const selectedDayRef = useRef<HTMLButtonElement>(null);
+  const [pickerDate, setPickerDate] = React.useState<Date | undefined>(selectedDate);
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   // Calculate the start of the day in the home timezone
   const startOfHomeDay = getHomeMidnightDate(selectedDate, homeTimezone);
@@ -45,6 +49,11 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
 
   const handleDayClick = (date: Date) => {
     // Create a date at midnight in the home timezone for the selected date
+    const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
+    onDateChange(midnightInHomeTimezone);
+  };
+
+  const handleDateChange = (date: Date) => {
     const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
     onDateChange(midnightInHomeTimezone);
   };
@@ -79,18 +88,26 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
   return (
     <div className="flex items-center justify-between w-full gap-4">
       {/* Month groups with date cells */}
-      <div className="flex-1 min-w-0 max-w-fit overflow-x-auto">
-        <div className="flex gap-1 w-fit items-center">
+      <div className="flex-1 min-w-0 overflow-x-auto">
+        <div className="flex gap-1 w-fit items-center min-w-[450px] xs:min-w-[500px] sm:min-w-[550px]">
           {/* Calendar icon cell as a clickable button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex flex-col items-center justify-center h-12 w-10 p-1 mt-3.5 text-center text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
-            aria-label="Open calendar"
-            onClick={() => { /* TODO: open calendar picker */ }}
-          >
-            <Calendar className="h-6 w-6" />
-          </Button>
+          <CustomDatePicker
+            value={pickerDate}
+            onSelect={(date) => {
+              setPickerDate(date);
+              handleDateChange(date);
+            }}
+            trigger={
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex flex-col items-center justify-center h-12 w-10 p-1 mt-3.5 text-center text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                aria-label="Open calendar"
+              >
+                <Calendar className="h-6 w-6" />
+              </Button>
+            }
+          />
           {monthGroups.map((group) => {
             // Get the days for this month group
             const groupDays = days.slice(group.start, group.end + 1);
@@ -107,8 +124,20 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
 
-                    // Show the month label above the first visible day of the month in the group
-                    const shouldShowMonthLabel = idx === 0 || day.getDate() === 1;
+                    // Show the month label logic:
+                    // 1. Always show for the middle date (index 4 in the 9-day range)
+                    // 2. Show for first day of month if it's visible
+                    // 3. Only show for month boundaries when month actually changes
+                    const globalIdx = group.start + idx;
+                    const isMiddleDate = globalIdx === 4; // Middle of 9-day range
+                    const isFirstOfMonth = day.getDate() === 1;
+                    
+                    // Check if this is actually a month boundary by comparing with previous day
+                    const prevDay = globalIdx > 0 ? days[globalIdx - 1] : null;
+                    const isMonthBoundary = prevDay && 
+                      (day.getMonth() !== prevDay.getMonth() || day.getFullYear() !== prevDay.getFullYear());
+                    
+                    const shouldShowMonthLabel = isMiddleDate || (isFirstOfMonth && isMonthBoundary);
 
                     return (
                       <div key={group.start + idx} className="relative">
@@ -149,9 +178,21 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
           })}
         </div>
       </div>
-      {/* Share Link Button */}
-      {onShareLink && (
-        <div className="shrink-0">
+      {/* Action buttons */}
+      <div className="shrink-0 mr-4 flex items-center gap-2">
+        {/* Dark Mode Toggle */}
+        <Button
+          onClick={toggleDarkMode}
+          variant="outline"
+          size="sm"
+          className="text-xs"
+          aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
+        
+        {/* Share Link Button */}
+        {onShareLink && (
           <Button
             onClick={onShareLink}
             variant="outline"
@@ -160,8 +201,8 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
           >
             Share Link
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

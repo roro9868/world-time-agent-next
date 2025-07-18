@@ -32,75 +32,83 @@ const TimeZoneHeaderCell: React.FC<{
 }> = React.memo(({ location, isHome, onRemove, dragHandleProps, totalLocations }) => {
   return (
   <td
-    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px] transition-colors group-hover:bg-muted ${
+    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[90px] xs:min-w-[100px] sm:min-w-[110px] transition-colors group-hover:bg-muted ${
       isHome ? 'bg-blue-50' : 'bg-card'
     } overflow-hidden`}
   >
     <div className="flex items-start gap-0.5 xs:gap-1">
       {/* Left column: Drag Handle and Remove Button */}
-      <div className="flex flex-col items-center gap-0.5 shrink-0">
-        {/* Drag Handle */}
-        <Button
-          {...dragHandleProps}
-          className="cursor-grab active:cursor-grabbing h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
-          title="Drag to reorder"
-          type="button"
-          aria-label={`Drag ${location.timezone.city} to reorder`}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            dragHandleProps?.onMouseDown?.(e);
-          }}
-          variant="ghost"
-          size="icon"
-        >
-          <GripVertical className="h-3 w-3" />
-        </Button>
-        {/* Remove Button */}
-        <Button
-          onClick={() => onRemove(location.id)}
-          disabled={totalLocations <= 1}
-          className={`h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
-            totalLocations <= 1 
-              ? 'text-muted-foreground/30 cursor-not-allowed' 
-              : 'text-muted-foreground hover:text-destructive'
-          }`}
-          title={
-            totalLocations <= 1 
-              ? "Cannot remove the last location" 
-              : isHome 
-                ? "Remove home location" 
-                : "Remove location"
-          }
-          aria-label={`Remove ${location.timezone.city} from list`}
-          variant="ghost"
-          size="icon"
-        >
-          <svg
-            className="h-2 xs:h-3 w-2 xs:w-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+      <div className="flex flex-col items-center shrink-0">
+        {/* Drag Handle - aligned with city name */}
+        <div className="flex items-center h-5 xs:h-6">
+          <Button
+            {...dragHandleProps}
+            className="cursor-grab active:cursor-grabbing h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
+            title="Drag to reorder"
+            type="button"
+            aria-label={`Drag ${location.timezone.city} to reorder`}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              dragHandleProps?.onMouseDown?.(e);
+            }}
+            variant="ghost"
+            size="icon"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </Button>
+            <GripVertical className="h-3 w-3" />
+          </Button>
+        </div>
+        {/* Remove Button - aligned with second row */}
+        <div className="flex items-center h-5 xs:h-6 mt-1">
+          <Button
+            onClick={() => onRemove(location.id)}
+            disabled={totalLocations <= 1}
+            className={`h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
+              totalLocations <= 1 
+                ? 'text-muted-foreground/30 cursor-not-allowed' 
+                : 'text-muted-foreground hover:text-destructive'
+            }`}
+            title={
+              totalLocations <= 1 
+                ? "Cannot remove the last location" 
+                : isHome 
+                  ? "Remove home location" 
+                  : "Remove location"
+            }
+            aria-label={`Remove ${location.timezone.city} from list`}
+            variant="ghost"
+            size="icon"
+          >
+            <svg
+              className="h-2 xs:h-3 w-2 xs:w-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </Button>
+        </div>
       </div>
       
       {/* Right column: City info */}
-      <div className="flex flex-col min-w-0 flex-1">
-        {/* First row: city + abbr + home */}
-        <div className="flex items-center min-w-0 gap-1">
+      <div className="flex flex-col min-w-0 flex-1 relative">
+        {/* First row: city + flag + home icon */}
+        <div className="flex items-center min-w-0 gap-1 h-5 xs:h-6">
           <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
             {location.timezone.city}
           </span>
-          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
-            {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
+          <span
+            className="text-base xs:text-lg shrink-0"
+            role="img"
+            aria-label={`Flag of ${location.timezone.country}`}
+          >
+            {location.timezone.flag}
           </span>
           {isHome && (
             <span className="ml-1 flex items-center">
@@ -108,16 +116,12 @@ const TimeZoneHeaderCell: React.FC<{
             </span>
           )}
         </div>
-        {/* Second row: flag + current time */}
-        <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1">
-          <span
-            className="text-base xs:text-lg shrink-0 mr-1"
-            role="img"
-            aria-label={`Flag of ${location.timezone.country}`}
-          >
-            {location.timezone.flag}
+        {/* Second row: abbr + current time */}
+        <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1 h-5 xs:h-6">
+          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
+            {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          <span className="text-slate-700 font-semibold shrink-0 text-[10px] xs:text-xs">
+          <span className="text-slate-700 dark:text-slate-300 font-semibold shrink-0 text-[10px] xs:text-xs ml-1">
             {formatCurrentTimeInZone(location.timezone.name)}
           </span>
         </div>

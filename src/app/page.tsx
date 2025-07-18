@@ -37,9 +37,20 @@ export default function Home() {
   } = useTimeZoneData();
 
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [notificationVariant, setNotificationVariant] = useState<'success' | 'error'>('success');
+  
   useEffect(() => {
     if (locations && locations.length > 0) setHasInitialized(true);
   }, [locations]);
+
+  const showToast = useCallback((message: string, variant: 'success' | 'error' = 'success') => {
+    setNotificationMessage(message);
+    setNotificationVariant(variant);
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 3000);
+  }, []);
 
   const tableRef = useRef<HTMLDivElement>(null);
 
@@ -110,7 +121,7 @@ export default function Home() {
   );
 
   const handleTimeSlotClick = useCallback(
-    (colIdx: number, slotUtc: Date, _slotLocal: Date, _slotTimezone: string) => {
+    (_colIdx: number, slotUtc: Date, _slotLocal: Date, _slotTimezone: string) => {
       setSelectedUtcDate(slotUtc);
       setSelectedTime(slotUtc);
       const dateStr = formatInTimeZone(slotUtc, homeTimezone, 'yyyy-MM-dd');
@@ -149,20 +160,23 @@ export default function Home() {
   const memoizedAddLocation = useCallback(addLocation, [addLocation]);
 
   const handleShareLink = useCallback(() => {
-    const url = new URL(window.location.href);
+    const url = new URL(window.location.origin + window.location.pathname);
+    
     // Add current state to URL params
     url.searchParams.set('cities', locations.map(l => `${l.timezone.name}:${l.timezone.city}`).join(','));
-    url.searchParams.set('date', selectedTime.toISOString());
-    url.searchParams.set('home', homeTimezone);
+    url.searchParams.set('selectedTime', selectedTime.toISOString());
+    url.searchParams.set('selectedUtcDate', selectedUtcDate?.toISOString() || selectedTime.toISOString());
+    url.searchParams.set('anchorDate', anchorDate.toISOString());
+    url.searchParams.set('homeTimezone', homeTimezone);
     
     // Copy to clipboard
     navigator.clipboard.writeText(url.toString()).then(() => {
-      // Simple success feedback - you could add a toast here
-      console.log('Share link copied to clipboard');
+      showToast('Share link copied to clipboard!', 'success');
     }).catch(err => {
       console.error('Failed to copy share link:', err);
+      showToast('Failed to copy link to clipboard', 'error');
     });
-  }, [locations, selectedTime, homeTimezone]);
+  }, [locations, selectedTime, selectedUtcDate, anchorDate, homeTimezone, showToast]);
 
   if (!hasInitialized && (!locations || locations.length === 0)) {
     return <div style={{ color: 'gray', textAlign: 'center', marginTop: 40 }}>Loading...</div>;
@@ -178,6 +192,24 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background transition-colors duration-300">
+        {/* Notification */}
+        {showNotification && (
+          <div className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+            notificationVariant === 'success' 
+              ? 'bg-green-500 text-white' 
+              : 'bg-red-500 text-white'
+          }`}>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">{notificationMessage}</span>
+              <button 
+                onClick={() => setShowNotification(false)}
+                className="ml-2 text-white hover:text-gray-200 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
         <div className="w-full">
           {/* Header */}
           <div className="w-full bg-slate-800 text-white shadow-lg mb-6">
@@ -206,17 +238,15 @@ export default function Home() {
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="overflow-x-auto w-full touch-pan-x">
-                      <table className="w-full border-separate border-spacing-0 min-w-[900px] sm:min-w-[1100px] lg:min-w-[1300px]">
+                      <table className="w-full border-separate border-spacing-0 min-w-[700px] sm:min-w-[800px] lg:min-w-[900px]">
                         <tbody>
                           {/* DateBar Header Row */}
                           <tr className="border-b border-border bg-white">
-                            <td className="sticky left-0 z-10 bg-white px-1 xs:px-2 py-2 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
-                              <div className="flex items-center justify-center">
-                                <LocationSelector
-                                  onAddLocation={memoizedAddLocation}
-                                  existingLocations={locations.map((l) => l.timezone)}
-                                />
-                              </div>
+                            <td className="sticky left-0 z-10 bg-white px-1 xs:px-2 py-2 border-r border-border min-w-[90px] xs:min-w-[100px] sm:min-w-[110px]">
+                              <LocationSelector
+                                onAddLocation={memoizedAddLocation}
+                                existingLocations={locations.map((l) => l.timezone)}
+                              />
                             </td>
                             <td className="px-0 py-2" colSpan={26}>
                               <div className="flex justify-center">

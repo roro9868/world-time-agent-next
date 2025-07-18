@@ -1,6 +1,9 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import React from 'react';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'World Time Agent',
@@ -39,7 +42,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{children}</body>
+      <body className={inter.className}>
+        {children}
+      </body>
     </html>
   );
 }
