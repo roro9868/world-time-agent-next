@@ -6,7 +6,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { generateAlignedTimeSlots } from '../utils/timeUtils';
-import { Button } from './components/ui/button';
+import { Button } from './ui/button';
 
 interface TimeZoneRowProps {
   location: Location;

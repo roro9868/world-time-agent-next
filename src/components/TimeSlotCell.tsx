@@ -2,7 +2,7 @@ import React from 'react';
 import { TimeSlot, TimeZone } from '../types';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getSlotBgColor } from '../utils/timeUtils';
-import { Button } from "./components/ui/button";
+import { Button } from "./ui/button";
 
 interface TimeSlotCellProps {
   slot: TimeSlot;

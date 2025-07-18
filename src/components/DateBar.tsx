@@ -3,9 +3,9 @@ import { Calendar } from 'lucide-react';
 import { toZonedTime } from 'date-fns-tz';
 import { isToday, isWeekend } from 'date-fns';
 import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
-import { Button } from "./components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/ui/popover";
-import { Calendar as ShadcnCalendar } from "./components/ui/calendar";
+import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Calendar as ShadcnCalendar } from "./ui/calendar";
 
 interface DateBarProps {
   selectedDate: Date;
