@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { MapPin, GripVertical } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import cityTimezones from 'city-timezones';
 import type { TimeZone } from '../types';
 
@@ -60,9 +60,6 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     top: 0,
     width: 320,
   });
-
-  // Get home city (first location in the list)
-  const homeCity = existingLocations[0];
 
   // Load city data from city-timezones library
   const allCityTz = useMemo(() => {
@@ -226,132 +223,82 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   }, [debouncedSearchTerm, matches.length]);
 
-  if (!homeCity) {
-    return (
-      <tr>
-        <td className="sticky left-0 z-10 bg-white px-2 sm:px-4 py-1 sm:py-2 align-top border-r border-gray-100 min-w-[100px] whitespace-nowrap truncate">
-          <div className="flex items-start space-x-1 sm:space-x-2 w-full">
-            <button
-              aria-hidden="true"
-              className="cursor-grab p-0.5 sm:p-1 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none touch-none"
-              disabled
-              style={{ pointerEvents: 'none' }}
-              tabIndex={-1}
-              title="Drag handle (disabled)"
-              type="button"
-            >
-              <GripVertical className="w-3 h-3 sm:w-4 sm:h-4" />
-            </button>
-            <MapPin className="text-lg sm:text-xl w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
-            <div className="flex flex-col min-w-0 w-full">
-              <div className="flex items-center min-w-0">
-                <input
-                  aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
-                  aria-autocomplete="list"
-                  aria-controls="location-selector-dropdown"
-                  aria-expanded={isFocused}
-                  aria-haspopup="listbox"
-                  aria-label="Search for a city to add"
-                  className="w-full bg-transparent border-none outline-none text-xs sm:text-sm placeholder-gray-400"
-                  onBlur={handleInputBlur}
-                  onChange={handleInputChange}
-                  onFocus={handleInputFocus}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Add a city..."
-                  ref={inputRef}
-                  role="combobox"
-                  type="text"
-                  value={searchTerm}
-                />
-              </div>
-            </div>
-          </div>
-        </td>
-      </tr>
-    );
-  }
-
   return (
-    <tr className="border-b border-border">
-              <td className="sticky left-0 z-10 bg-card px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
-        <div className="flex items-center gap-0.5 xs:gap-1 w-full h-full py-1">
-          <div className="shrink-0 h-5 xs:h-6 w-5 xs:w-6 flex items-center justify-center">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div className="flex items-center min-w-0 flex-1 gap-1">
-            <input
-              aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
-              aria-autocomplete="list"
-              aria-controls="location-selector-dropdown"
-              aria-expanded={isFocused}
-              aria-label="Search for a city to add"
-              className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
-              placeholder="Add city..."
-              role="combobox"
-              type="text"
-              value={searchTerm}
-              onChange={handleInputChange}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
-              onKeyDown={handleKeyDown}
-              ref={inputRef}
-            />
-          </div>
-        </div>
-        {isFocused &&
-          ReactDOM.createPortal(
-            <div
-              id="location-selector-dropdown"
-              className="fixed z-50 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto"
-              style={{
-                left: dropdownPos.left,
-                top: dropdownPos.top,
-                width: dropdownPos.width,
-                minWidth: '320px',
-              }}
-              ref={dropdownRef}
-            >
-              {matches.length > 0 ? (
-                matches.map((entry, index) => (
-                  <button
-                    key={`${entry.name}:${entry.city}`}
-                    aria-selected={index === activeIndex}
-                    className={`w-full px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
-                      index === activeIndex ? 'bg-accent text-accent-foreground' : ''
-                    }`}
-                    id={`option-${index}`}
-                    onClick={handleOptionClick(entry)}
-                    onMouseDown={handleOptionMouseDown}
-                    role="option"
-                    type="button"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg shrink-0">{entry.flag}</span>
-                      <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-semibold text-foreground truncate">
-                          {entry.city}
-                        </span>
-                        <span className="text-xs text-muted-foreground truncate">
-                          {entry.country} • {entry.name}
-                        </span>
-                      </div>
+    <div className="flex items-center gap-1 w-full">
+      <div className="shrink-0 h-4 w-4 flex items-center justify-center">
+        <MapPin className="h-3 w-3 text-muted-foreground" />
+      </div>
+      <div className="flex items-center min-w-0 flex-1">
+        <input
+          aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
+          aria-autocomplete="list"
+          aria-controls="location-selector-dropdown"
+          aria-expanded={isFocused}
+          aria-label="Search for a city to add"
+          className="flex-1 bg-transparent border border-input rounded px-1.5 py-0.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring min-w-0"
+          placeholder="Add city..."
+          role="combobox"
+          type="text"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
+          ref={inputRef}
+        />
+      </div>
+      {isFocused &&
+        ReactDOM.createPortal(
+          <div
+            id="location-selector-dropdown"
+            className="fixed z-50 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto"
+            style={{
+              left: dropdownPos.left,
+              top: dropdownPos.top,
+              width: dropdownPos.width,
+              minWidth: '320px',
+            }}
+            ref={dropdownRef}
+          >
+            {matches.length > 0 ? (
+              matches.map((entry, index) => (
+                <button
+                  key={`${entry.name}:${entry.city}`}
+                  aria-selected={index === activeIndex}
+                  className={`w-full px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                    index === activeIndex ? 'bg-accent text-accent-foreground' : ''
+                  }`}
+                  id={`option-${index}`}
+                  onClick={handleOptionClick(entry)}
+                  onMouseDown={handleOptionMouseDown}
+                  role="option"
+                  type="button"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg shrink-0">{entry.flag}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-semibold text-foreground truncate">
+                        {entry.city}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {entry.country} • {entry.name}
+                      </span>
                     </div>
-                  </button>
-                ))
-              ) : notFound ? (
-                <div className="px-3 py-2 text-sm text-muted-foreground">
-                  No cities found
-                </div>
-              ) : (
-                <div className="px-3 py-2 text-sm text-muted-foreground">
-                  Start typing to search...
-                </div>
-              )}
-            </div>,
-            document.body,
-          )}
-      </td>
-      <td colSpan={26} className="p-0"></td>
-    </tr>
+                  </div>
+                </button>
+              ))
+            ) : notFound ? (
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                No cities found
+              </div>
+            ) : (
+              <div className="px-3 py-2 text-sm text-muted-foreground">
+                Start typing to search...
+              </div>
+            )}
+          </div>,
+          document.body,
+        )}
+    </div>
   );
 };

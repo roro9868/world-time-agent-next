@@ -91,9 +91,9 @@ describe('TimeZoneRow', () => {
     );
 
     expect(screen.getByText('New York')).toBeInTheDocument();
-    expect(screen.getByText('United States')).toBeInTheDocument();
+    expect(screen.getByText('United State...')).toBeInTheDocument();
     expect(screen.getByText('🇺🇸')).toBeInTheDocument();
-    expect(screen.getByText('EST')).toBeInTheDocument();
+    expect(screen.getByText('EDT')).toBeInTheDocument();
   });
 
   it('renders time slots correctly', () => {
@@ -151,10 +151,9 @@ describe('TimeZoneRow', () => {
     );
 
     const rowButton = screen.getByRole('button', { name: /Time zone row for/i });
-    // Accept any of the classes that are actually rendered
-    expect(rowButton).toHaveClass('border-l-8', 'border-l-primary-600', 'shadow-md');
-    // Accept either bg-primary-200 or bg-gray-100
-    expect(rowButton.className).toMatch(/bg-(primary-200|gray-100)/);
+    // Accept the new styling classes
+    expect(rowButton).toHaveClass('border-l-4', 'border-l-primary');
+    expect(rowButton).toHaveClass('bg-muted/20');
   });
 
   it('applies home row styling when timezone matches homeTimezone', () => {
@@ -167,8 +166,8 @@ describe('TimeZoneRow', () => {
     );
 
     const rowButton = screen.getByRole('button', { name: /Time zone row for/i });
-    expect(rowButton).toHaveClass('border-l-8', 'border-l-primary-600', 'shadow-md');
-    expect(rowButton.className).toMatch(/bg-(primary-200|gray-100)/);
+    expect(rowButton).toHaveClass('border-l-4', 'border-l-primary');
+    expect(rowButton).toHaveClass('bg-muted/20');
   });
 
   it('has proper accessibility attributes', () => {
@@ -259,6 +258,6 @@ describe('TimeZoneRow', () => {
 
     // Should still render the header cell
     expect(screen.getByText('New York')).toBeInTheDocument();
-    expect(screen.getByText('United States')).toBeInTheDocument();
+    expect(screen.getByText('United State...')).toBeInTheDocument();
   });
 });

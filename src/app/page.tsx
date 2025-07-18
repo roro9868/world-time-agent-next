@@ -181,20 +181,12 @@ export default function Home() {
         <div className="w-full">
           {/* Header */}
           <div className="w-full bg-slate-800 text-white shadow-lg mb-6">
-            <div className="container mx-auto px-4 py-3 flex items-center justify-between max-w-7xl">
+            <div className="container mx-auto px-4 py-3 flex items-center justify-center max-w-7xl">
               <div className="flex items-center gap-3">
                 <div className="relative flex items-center justify-center">
                   <Globe className="h-6 w-6 text-teal-400" />
                 </div>
                 <h1 className="text-xl font-bold text-white">World Time Agent</h1>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-gray-300 hover:text-white cursor-pointer">My Cities</span>
-                <span className="text-gray-300 hover:text-white cursor-pointer">Explore</span>
-                <span className="text-gray-300 hover:text-white cursor-pointer">Settings</span>
-                <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs font-bold text-white">A</span>
-                </div>
               </div>
             </div>
           </div>
@@ -218,12 +210,15 @@ export default function Home() {
                         <tbody>
                           {/* DateBar Header Row */}
                           <tr className="border-b border-border bg-muted/30">
-                            <td className="sticky left-0 z-10 bg-muted/30 px-1 xs:px-2 py-3 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
+                            <td className="sticky left-0 z-10 bg-muted px-1 xs:px-2 py-2 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
                               <div className="flex items-center justify-center">
-                                <span className="text-xs font-medium text-muted-foreground"></span>
+                                <LocationSelector
+                                  onAddLocation={memoizedAddLocation}
+                                  existingLocations={locations.map((l) => l.timezone)}
+                                />
                               </div>
                             </td>
-                            <td className="px-0 py-3" colSpan={26}>
+                            <td className="px-0 py-2" colSpan={26}>
                               <div className="flex justify-center">
                                 <DateBar
                                   selectedDate={selectedTime}
@@ -247,10 +242,6 @@ export default function Home() {
                               totalLocations={locations.length}
                             />
                           ))}
-                          <LocationSelector
-                            onAddLocation={memoizedAddLocation}
-                            existingLocations={locations.map((l) => l.timezone)}
-                          />
                         </tbody>
                       </table>
                     </div>

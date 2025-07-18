@@ -23,17 +23,16 @@ interface TimeZoneRowProps {
 const TimeZoneHeaderCell: React.FC<{
   location: Location;
   isHome: boolean;
-  homeTimezone: string;
   onRemove: (id: string) => void;
   dragHandleProps?: {
     onMouseDown?: (e: React.MouseEvent) => void;
   };
   totalLocations: number;
-}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps, totalLocations }) => {
+}> = React.memo(({ location, isHome, onRemove, dragHandleProps, totalLocations }) => {
   return (
   <td
-    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px] transition-colors group-hover:bg-muted/50 ${
-      isHome ? 'bg-muted/30' : 'bg-card'
+    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px] transition-colors group-hover:bg-muted ${
+      isHome ? 'bg-muted' : 'bg-card'
     } overflow-hidden`}
   >
     <div className="flex items-center gap-0.5 xs:gap-1">
@@ -131,7 +130,6 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     location,
     onTimeSlotClick,
     onRemove,
-    isHome = false,
     homeTimezone,
     anchorDate,
     selectedUtcDate,
@@ -176,7 +174,6 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         <TimeZoneHeaderCell
           location={location}
           isHome={!!isHomeRow}
-          homeTimezone={homeTimezone || ''}
           onRemove={onRemove}
           dragHandleProps={listeners}
           totalLocations={totalLocations}

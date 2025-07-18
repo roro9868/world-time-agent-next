@@ -109,7 +109,7 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                         variant={isSelected ? "default" : isTodayDate ? "outline" : "ghost"}
                         size="sm"
                         className={`
-                          flex flex-col items-center justify-center h-14 w-10 p-1 text-center
+                          flex flex-col items-center justify-center h-12 w-10 p-1 text-center
                           ${isSelected 
                             ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
                             : isTodayDate 
