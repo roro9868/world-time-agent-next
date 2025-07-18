@@ -19,21 +19,21 @@ const getTimeSlotStyling = (
 ): { className: string; variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined } => {
   if (isSelected) {
     return {
-      className: 'bg-primary text-primary-foreground hover:bg-primary/90',
+      className: 'bg-slate-600 text-white border-slate-500 ring-2 ring-slate-400/50 hover:bg-slate-700 shadow-md',
       variant: 'default'
     };
   }
   
   if (isCurrent) {
     return {
-      className: 'bg-green-100 text-green-800 border-green-300 ring-2 ring-green-400/50 hover:bg-green-200',
+      className: 'bg-teal-100 text-teal-800 border-teal-300 ring-2 ring-teal-400/50 hover:bg-teal-200',
       variant: 'outline'
     };
   }
 
   // Day/night background colors
   const isDaytime = slot.hour >= 7 && slot.hour < 19;
-  const bgClass = isDaytime ? 'bg-amber-50/50 hover:bg-amber-100/70' : 'bg-blue-50/50 hover:bg-blue-100/70';
+  const bgClass = isDaytime ? 'bg-amber-50/50 hover:bg-amber-100/70' : 'bg-slate-50/50 hover:bg-slate-100/70';
   
   return {
     className: `${bgClass} hover:bg-accent hover:text-accent-foreground`,
@@ -91,7 +91,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   const styling = getTimeSlotStyling(slot, slot.isSelected, slot.isCurrent);
   
   return (
-    <td className="px-0 py-0 text-center align-middle relative">
+    <td className="px-0 py-0 text-center align-middle relative min-w-[24px] xs:min-w-[32px] sm:min-w-[40px]">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
         {/* Show date label for first column, or at every local midnight/12:30AM, overlapping the top of the button */}
         {showDateLabel && (
@@ -105,7 +105,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           variant={styling.variant}
           size="sm"
           className={`
-            min-w-0 w-5 xs:w-6 sm:w-8 h-8 xs:h-10 sm:h-12 px-0 py-0.5 rounded-sm font-normal text-[10px] xs:text-xs
+            min-w-0 w-6 xs:w-8 sm:w-10 h-10 xs:h-12 sm:h-14 px-0 py-0.5 rounded-sm font-normal text-xs xs:text-sm
             transition-all duration-200 flex flex-col items-center justify-center gap-0
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
             ${styling.className}
@@ -117,14 +117,14 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           <span
             className={
               timeLabel.includes(':')
-                ? 'text-[8px] xs:text-[10px] leading-none font-medium'
-                : 'text-[10px] xs:text-xs leading-none font-semibold'
+                ? 'text-xs xs:text-sm leading-none font-medium'
+                : 'text-sm xs:text-base leading-none font-bold'
             }
           >
             {timeLabel}
           </span>
           {ampm && (
-            <span className="text-[6px] xs:text-[8px] leading-none font-medium opacity-75 uppercase">
+            <span className="text-[8px] xs:text-[10px] leading-none font-medium opacity-75 uppercase">
               {ampm}
             </span>
           )}

@@ -3,7 +3,6 @@ import { toZonedTime } from 'date-fns-tz';
 import { isWeekend } from 'date-fns';
 import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
 import { Button } from "./ui/button";
-import { DatePicker } from "./ui/date-picker";
 
 interface DateBarProps {
   selectedDate: Date;
@@ -76,21 +75,9 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
   }, [selectedDate, days.length]);
 
   return (
-    <div className="flex items-center gap-4 w-full">
-      {/* DatePicker icon button popover */}
-      <DatePicker
-        date={selectedDate}
-        onDateChange={(date) => {
-          if (date) {
-            const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
-            onDateChange(midnightInHomeTimezone);
-          }
-        }}
-        fromYear={2000}
-        toYear={2100}
-      />
+    <div className="flex items-center justify-center w-full">
       {/* Month groups with date cells */}
-      <div className="flex-1 min-w-0 max-w-fit">
+      <div className="flex-1 min-w-0 max-w-fit overflow-x-auto">
         <div className="flex gap-1 w-fit">
           {monthGroups.map((group) => {
             // Get the days for this month group

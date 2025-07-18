@@ -273,28 +273,28 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   return (
     <tr className="border-b border-border">
-      <td className="sticky left-0 z-10 bg-card px-4 py-3 align-top border-r border-border min-w-[200px]">
-        <div className="flex items-center gap-2 w-full h-full py-1">
+      <td className="sticky left-0 z-10 bg-card px-2 xs:px-3 py-2 xs:py-3 align-top border-r border-border min-w-[120px] xs:min-w-[140px] sm:min-w-[160px] max-w-[120px] xs:max-w-[140px] sm:max-w-[160px]">
+        <div className="flex items-center gap-1 xs:gap-2 w-full h-full py-1">
           <button
             aria-hidden="true"
-            className="cursor-not-allowed shrink-0 h-6 w-6 p-0 text-muted-foreground opacity-30"
+            className="cursor-not-allowed shrink-0 h-5 xs:h-6 w-5 xs:w-6 p-0 text-muted-foreground opacity-30"
             disabled
             style={{ pointerEvents: 'none' }}
             tabIndex={-1}
             title="Drag handle (disabled)"
             type="button"
           >
-            <GripVertical className="h-4 w-4" />
+            <GripVertical className="h-3 xs:h-4 w-3 xs:w-4" />
           </button>
-          <MapPin className="h-5 w-5 text-muted-foreground shrink-0" />
-          <div className="flex items-center min-w-0 flex-1 gap-2">
+          <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
+          <div className="flex items-center min-w-0 flex-1 gap-1">
             <input
               aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
               aria-autocomplete="list"
               aria-controls="location-selector-dropdown"
               aria-expanded={isFocused}
               aria-label="Search for a city to add"
-              className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
+              className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
               placeholder="Add city..."
               role="combobox"
               type="text"
@@ -305,7 +305,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               onKeyDown={handleKeyDown}
               ref={inputRef}
             />
-            <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-medium whitespace-nowrap shrink-0">
+            <span className="px-1 py-0.5 rounded bg-teal-100 text-teal-700 text-[8px] font-medium whitespace-nowrap shrink-0">
               ADD
             </span>
           </div>

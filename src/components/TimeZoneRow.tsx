@@ -29,7 +29,7 @@ const TimeZoneHeaderCell: React.FC<{
   totalLocations: number;
 }> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps, totalLocations }) => (
   <td
-    className={`sticky left-0 z-20 px-2 xs:px-3 sm:px-4 py-2 xs:py-3 align-top border-r border-border min-w-[140px] xs:min-w-[160px] sm:min-w-[200px] max-w-[140px] xs:max-w-[160px] sm:max-w-[200px] transition-colors group-hover:bg-muted/50 ${
+    className={`sticky left-0 z-20 px-2 xs:px-3 py-2 xs:py-3 align-top border-r border-border min-w-[120px] xs:min-w-[140px] sm:min-w-[160px] max-w-[120px] xs:max-w-[140px] sm:max-w-[160px] transition-colors group-hover:bg-muted/50 ${
       isHome ? 'bg-muted/30' : 'bg-card'
     } overflow-hidden`}
   >
@@ -58,14 +58,19 @@ const TimeZoneHeaderCell: React.FC<{
         {location.timezone.flag}
       </span>
       <div className="flex flex-col min-w-0 flex-1">
-        {/* First row: city + abbr + remove button */}
-        <div className="flex items-center min-w-0 gap-1 xs:gap-2">
+        {/* First row: city + abbr + home + remove button */}
+        <div className="flex items-center min-w-0 gap-1">
           <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
             {location.timezone.city}
           </span>
           <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
+          {isHome && (
+            <span className="px-1 xs:px-1.5 py-0.5 bg-teal-100 text-teal-700 text-[8px] xs:text-[10px] font-medium rounded shrink-0">
+              Home
+            </span>
+          )}
           <Button
             onClick={() => onRemove(location.id)}
             disabled={totalLocations <= 1}
@@ -103,17 +108,12 @@ const TimeZoneHeaderCell: React.FC<{
         </div>
         {/* Second row: country + current time */}
         <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1">
-          <span className="truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[140px]">
+          <span className="truncate max-w-[70px] xs:max-w-[90px] sm:max-w-[110px]">
             {location.timezone.country}
           </span>
-          <span className="ml-1 xs:ml-2 text-primary font-semibold shrink-0 text-[10px] xs:text-xs">
+          <span className="ml-1 xs:ml-2 text-slate-700 font-semibold shrink-0 text-[10px] xs:text-xs">
             {formatCurrentTimeInZone(location.timezone.name)}
           </span>
-          {isHome && (
-            <span className="ml-1 xs:ml-2 px-1 xs:px-1.5 py-0.5 bg-primary/10 text-primary text-[8px] xs:text-[10px] font-medium rounded shrink-0">
-              Home
-            </span>
-          )}
         </div>
       </div>
     </div>
