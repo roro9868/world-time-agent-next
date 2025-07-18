@@ -19,6 +19,7 @@ import {
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useTimeZoneData } from '@/hooks/useTimeZoneData';
+import { safeClipboardWrite } from '@/services/errorHandler';
 
 export default function Home() {
   // All hooks must be called at the top level
@@ -169,12 +170,13 @@ export default function Home() {
     url.searchParams.set('anchorDate', anchorDate.toISOString());
     url.searchParams.set('homeTimezone', homeTimezone);
     
-    // Copy to clipboard
-    navigator.clipboard.writeText(url.toString()).then(() => {
-      showToast('Share link copied to clipboard!', 'success');
-    }).catch(err => {
-      console.error('Failed to copy share link:', err);
-      showToast('Failed to copy link to clipboard', 'error');
+    // Copy to clipboard with error handling
+    safeClipboardWrite(url.toString()).then((success: boolean) => {
+      if (success) {
+        showToast('Share link copied to clipboard!', 'success');
+      } else {
+        showToast('Failed to copy link to clipboard', 'error');
+      }
     });
   }, [locations, selectedTime, selectedUtcDate, anchorDate, homeTimezone, showToast]);
 
@@ -238,11 +240,26 @@ export default function Home() {
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="overflow-x-auto w-full touch-pan-x">
-                      <table className="w-full border-separate border-spacing-0 min-w-[700px] sm:min-w-[800px] lg:min-w-[900px]">
+                      <table 
+                        className="w-full border-separate border-spacing-0 min-w-[700px] sm:min-w-[800px] lg:min-w-[1000px]"
+                        role="grid"
+                        aria-label="Time zone comparison table"
+                        aria-rowcount={locations.length + 1}
+                        aria-colcount={27}
+                      >
                         <tbody>
                           {/* DateBar Header Row */}
-                          <tr className="border-b border-border bg-white">
-                            <td className="sticky left-0 z-10 bg-white px-1 xs:px-2 py-2 border-r border-border min-w-[90px] xs:min-w-[100px] sm:min-w-[110px]">
+                          <tr 
+                            className="border-b border-border bg-card"
+                            role="row"
+                            aria-rowindex={1}
+                            aria-label="Date and location selector row"
+                          >
+                            <td 
+                              className="sticky left-0 z-10 bg-card px-1 xs:px-2 py-2 border-r border-border min-w-[75px] xs:min-w-[80px] sm:min-w-[85px]"
+                              role="gridcell"
+                              aria-colindex={1}
+                            >
                               <LocationSelector
                                 onAddLocation={memoizedAddLocation}
                                 existingLocations={locations.map((l) => l.timezone)}

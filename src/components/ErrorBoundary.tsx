@@ -16,8 +16,8 @@ interface ErrorBoundaryProps {
 }
 
 const DefaultErrorFallback: React.FC<{ error?: Error; errorInfo?: ErrorInfo }> = ({ error }) => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-6">
       <div className="text-center">
         <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
           <svg
@@ -34,8 +34,8 @@ const DefaultErrorFallback: React.FC<{ error?: Error; errorInfo?: ErrorInfo }> =
             />
           </svg>
         </div>
-        <h3 className="mt-4 text-lg font-medium text-gray-900">Something went wrong</h3>
-        <p className="mt-2 text-sm text-gray-500">
+        <h3 className="mt-4 text-lg font-medium text-foreground">Something went wrong</h3>
+        <p className="mt-2 text-sm text-muted-foreground">
           {error?.message || 'An unexpected error occurred. Please try refreshing the page.'}
         </p>
         <div className="mt-6">

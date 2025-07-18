@@ -3,18 +3,38 @@ import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 import type { TimeSlot } from '../types';
 import { getCurrentTimezoneAbbr, getTimezoneAbbrForDate } from './timezoneAbbr';
 
-// Always use the IANA time zone name (e.g., 'Asia/Shanghai') for all calculations. Ignore the offset/abbreviation for current time.
+/**
+ * Formats a date for display in a specific timezone
+ * @param date - The date to format
+ * @param timeZone - IANA timezone identifier (e.g., 'Asia/Shanghai')
+ * @returns Formatted time string in 'h:mm a' format
+ * @example
+ * formatTime(new Date(), 'America/New_York') // "2:30 PM"
+ */
 export const formatTime = (date: Date, timeZone: string): string => {
   return formatInTimeZone(date, timeZone, 'h:mm a');
 };
 
-// Use only the IANA time zone name
-// Returns the current time in the given timezone as a Date object
+/**
+ * Gets the current time in a specific timezone
+ * Note: Returns current UTC time as formatting will handle timezone conversion
+ * @param timeZone - IANA timezone identifier
+ * @returns Current Date object (UTC)
+ * @example
+ * getCurrentTimeInZone('Europe/London') // Current Date object
+ */
 export const getCurrentTimeInZone = (timeZone: string): Date => {
   // Always return the current UTC time; formatting will handle the zone
   return new Date();
 };
 
+/**
+ * Formats the current time in a specific timezone
+ * @param timeZone - IANA timezone identifier
+ * @returns Current time formatted as 'h:mm a' in the specified timezone
+ * @example
+ * formatCurrentTimeInZone('Asia/Tokyo') // "11:45 PM"
+ */
 export const formatCurrentTimeInZone = (timeZone: string): string => {
   return formatInTimeZone(new Date(), timeZone, 'h:mm a');
 };
@@ -25,7 +45,27 @@ export const convertTimeToZone = (date: Date, fromZone: string, toZone: string):
   return toZonedTime(utcDate, toZone);
 };
 
-// Generate time slots for a given date, aligning all cities to the home city's midnight
+/**
+ * Generates aligned time slots for timezone comparison
+ * Creates a 24-hour timeline (or 26-hour for half-hour timezones) starting from midnight
+ * in the home timezone and showing corresponding times in the target timezone
+ * 
+ * @param baseDate - The reference date in home timezone (local time)
+ * @param homeTimezone - IANA timezone identifier for home location
+ * @param targetTimezone - IANA timezone identifier for target location
+ * @param selectedTime - Currently selected time for highlighting (optional)
+ * @param selectedUtcDate - Selected UTC date for calculations (optional)
+ * @returns Array of TimeSlot objects with local and UTC times
+ * 
+ * @example
+ * const slots = generateAlignedTimeSlots(
+ *   new Date('2024-01-01'),
+ *   'America/New_York',
+ *   'Asia/Tokyo',
+ *   new Date()
+ * );
+ * // Returns 26 time slots showing Tokyo times aligned to NYC midnight
+ */
 export function generateAlignedTimeSlots(
   baseDate: Date, // selected date (local time)
   homeTimezone: string,

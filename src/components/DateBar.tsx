@@ -126,23 +126,24 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
 
                     // Show the month label logic:
                     // 1. Always show for the middle date (index 4 in the 9-day range)
-                    // 2. Show for first day of month if it's visible
-                    // 3. Only show for month boundaries when month actually changes
+                    // 2. Show for last day of previous month (when next day is first of new month)
+                    // 3. Don't show for first day of month if same month as middle date
                     const globalIdx = group.start + idx;
                     const isMiddleDate = globalIdx === 4; // Middle of 9-day range
-                    const isFirstOfMonth = day.getDate() === 1;
+                    const middleDate = days[4];
                     
-                    // Check if this is actually a month boundary by comparing with previous day
-                    const prevDay = globalIdx > 0 ? days[globalIdx - 1] : null;
-                    const isMonthBoundary = prevDay && 
-                      (day.getMonth() !== prevDay.getMonth() || day.getFullYear() !== prevDay.getFullYear());
+                    // Check if next day is first of a different month
+                    const nextDay = globalIdx < days.length - 1 ? days[globalIdx + 1] : null;
+                    const isLastDayOfMonth = nextDay && nextDay.getDate() === 1 && 
+                      (day.getMonth() !== nextDay.getMonth() || day.getFullYear() !== nextDay.getFullYear());
                     
-                    const shouldShowMonthLabel = isMiddleDate || (isFirstOfMonth && isMonthBoundary);
+                    // Only show month label if it's the middle date OR it's the last day of a different month than the middle
+                    const shouldShowMonthLabel = isMiddleDate || (isLastDayOfMonth && day.getMonth() !== middleDate.getMonth());
 
                     return (
                       <div key={group.start + idx} className="relative">
                         {shouldShowMonthLabel && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-primary bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-foreground bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border shadow-sm">
                             {group.month}
                           </div>
                         )}
@@ -159,7 +160,7 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                                 ? 'border-primary text-primary hover:bg-primary/10' 
                                 : 'hover:bg-accent hover:text-accent-foreground'
                             }
-                            ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50' : ''}
+                            ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20' : ''}
                           `}
                         >
                           <span className="text-sm font-semibold leading-none">

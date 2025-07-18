@@ -101,8 +101,16 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
       .filter((dc) => dc.timezone !== userTimezone)
       .map((dc) => {
         // Find the city in the city-timezones library
+        interface CityInfo {
+          timezone: string;
+          city: string;
+          country: string;
+          iso2: string;
+          pop?: number;
+        }
+        
         const cityInfo = Object.values(cityTimezones.cityMapping).find(
-          (info: any) => info.timezone === dc.timezone && info.city === dc.city,
+          (info: CityInfo) => info.timezone === dc.timezone && info.city === dc.city,
         );
 
         if (!cityInfo) {
@@ -187,8 +195,16 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
       'Pacific/Fiji': 'Suva',
     };
 
+    interface CityTimezoneInfo {
+      timezone: string;
+      city: string;
+      country: string;
+      iso2: string;
+      pop?: number;
+    }
+    
     let localCityInfo = Object.values(cityTimezones.cityMapping).find(
-      (info: any) =>
+      (info: CityTimezoneInfo) =>
         info.timezone === userTimezone &&
         info.city === priorityCities[userTimezone as keyof typeof priorityCities],
     );

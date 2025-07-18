@@ -32,8 +32,8 @@ const TimeZoneHeaderCell: React.FC<{
 }> = React.memo(({ location, isHome, onRemove, dragHandleProps, totalLocations }) => {
   return (
   <td
-    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[90px] xs:min-w-[100px] sm:min-w-[110px] transition-colors group-hover:bg-muted ${
-      isHome ? 'bg-blue-50' : 'bg-card'
+    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[75px] xs:min-w-[80px] sm:min-w-[85px] transition-colors group-hover:bg-muted ${
+      isHome ? 'bg-blue-50 dark:bg-blue-900/40 border-l-2 border-l-blue-500 dark:border-l-blue-400' : 'bg-card'
     } overflow-hidden`}
   >
     <div className="flex items-start gap-0.5 xs:gap-1">
@@ -121,7 +121,7 @@ const TimeZoneHeaderCell: React.FC<{
           <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          <span className="text-slate-700 dark:text-slate-300 font-semibold shrink-0 text-[10px] xs:text-xs ml-1">
+          <span className="text-slate-700 dark:text-slate-100 font-semibold shrink-0 text-[10px] xs:text-xs ml-1">
             {formatCurrentTimeInZone(location.timezone.name)}
           </span>
         </div>
@@ -146,7 +146,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     const { timezone } = location;
     const isHomeRow = homeTimezone && timezone.name === homeTimezone;
 
-    // Memoize timeSlots for this row only
+    // Memoize timeSlots for this row only - add timezone offset to dependency array
     const timeSlots = React.useMemo(() => {
       return generateAlignedTimeSlots(
         anchorDate,
@@ -155,7 +155,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         anchorDate,
         selectedUtcDate,
       );
-    }, [anchorDate, homeTimezone, timezone.name, selectedUtcDate]);
+    }, [anchorDate, homeTimezone, timezone.name, selectedUtcDate, timezone.offset]);
 
     // Make the row draggable
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -172,7 +172,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         ref={setNodeRef}
         style={style}
         className={`group hover:bg-muted/30 transition-colors border-b border-border ${
-          isHomeRow ? 'bg-blue-50/50 border-l-4 border-l-primary' : ''
+          isHomeRow ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
         } ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
         aria-label={`Time zone row for ${location.timezone.city}`}
         {...attributes}

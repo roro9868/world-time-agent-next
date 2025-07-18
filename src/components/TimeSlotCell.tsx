@@ -19,14 +19,14 @@ const getTimeSlotStyling = (
 ): { className: string; variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined } => {
   if (isSelected) {
     return {
-      className: 'bg-slate-600 text-white border-slate-500 ring-2 ring-slate-400/50 hover:bg-slate-700 shadow-md',
+      className: 'bg-slate-600 dark:bg-slate-700 text-white border-slate-500 dark:border-slate-600 ring-2 ring-slate-400/50 dark:ring-slate-300/50 hover:bg-slate-700 dark:hover:bg-slate-600 shadow-md',
       variant: 'default'
     };
   }
   
   if (isCurrent) {
     return {
-      className: 'bg-teal-100 text-teal-800 border-teal-300 ring-2 ring-teal-400/50 hover:bg-teal-200',
+      className: 'bg-teal-100 dark:bg-teal-900/40 text-teal-800 dark:text-teal-200 border-teal-300 dark:border-teal-600 ring-2 ring-teal-400/50 dark:ring-teal-300/50 hover:bg-teal-200 dark:hover:bg-teal-900/60',
       variant: 'outline'
     };
   }
@@ -34,8 +34,8 @@ const getTimeSlotStyling = (
   // Day/night background colors with better visual hierarchy
   const isDaytime = slot.hour >= 7 && slot.hour < 19;
   const bgClass = isDaytime 
-    ? 'bg-amber-50/60 hover:bg-amber-100/80 border-amber-100/40 dark:bg-amber-900/20 dark:hover:bg-amber-800/30 dark:border-amber-800/30' 
-    : 'bg-blue-50/60 hover:bg-blue-100/80 border-blue-100/40 dark:bg-blue-900/20 dark:hover:bg-blue-800/30 dark:border-blue-800/30';
+    ? 'bg-amber-50/60 hover:bg-amber-100/80 border-amber-100/40 dark:bg-amber-900/30 dark:hover:bg-amber-800/40 dark:border-amber-700/40' 
+    : 'bg-blue-50/60 hover:bg-blue-100/80 border-blue-100/40 dark:bg-blue-900/30 dark:hover:bg-blue-800/40 dark:border-blue-700/40';
   
   return {
     className: `${bgClass} hover:bg-accent hover:text-accent-foreground`,
@@ -43,7 +43,7 @@ const getTimeSlotStyling = (
   };
 };
 
-const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
+const TimeSlotCell: React.FC<TimeSlotCellProps> = React.memo(({
   slot,
   colIdx,
   timezone,
@@ -94,11 +94,11 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   const styling = getTimeSlotStyling(slot, slot.isSelected, slot.isCurrent);
   
   return (
-    <td className="px-0 py-0 text-center align-middle relative min-w-[20px] xs:min-w-[24px] sm:min-w-[28px]">
+    <td className="px-0 py-0 text-center align-middle relative min-w-[20px] xs:min-w-[24px] sm:min-w-[28px] lg:min-w-[32px]">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
         {/* Show date label for first column, or at every local midnight/12:30AM, overlapping the top of the button */}
         {showDateLabel && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] font-semibold text-primary bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-foreground bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border shadow-sm">
             {formatInTimeZone(slot.utc, timezone.name, 'MMM d')}
           </div>
         )}
@@ -108,7 +108,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           variant={styling.variant}
           size="sm"
           className={`
-            min-w-0 w-5 xs:w-6 sm:w-7 h-8 xs:h-10 sm:h-12 px-0 py-0.5 rounded-sm font-normal text-[10px] xs:text-xs
+            min-w-0 w-5 xs:w-6 sm:w-7 lg:w-8 h-8 xs:h-10 sm:h-12 lg:h-14 px-0 py-0.5 rounded-sm font-normal text-[10px] xs:text-xs lg:text-sm
             transition-all duration-200 flex flex-col items-center justify-center gap-0
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
             ${styling.className}
@@ -118,17 +118,17 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           tabIndex={0}
         >
           <div className="flex items-center justify-center">
-            <span className="text-xs xs:text-sm leading-none font-bold">
+            <span className="text-xs xs:text-sm lg:text-base leading-none font-bold">
               {hourPart}
             </span>
             {isHalfHour && (
-              <span className="text-[8px] xs:text-[9px] leading-none font-medium opacity-75">
+              <span className="text-[8px] xs:text-[9px] lg:text-[10px] leading-none font-medium opacity-75">
                 :30
               </span>
             )}
           </div>
           {ampm && (
-            <span className="text-[8px] xs:text-[9px] leading-none font-medium opacity-75 uppercase">
+            <span className="text-[8px] xs:text-[9px] lg:text-[10px] leading-none font-medium opacity-75 uppercase">
               {ampm}
             </span>
           )}
@@ -136,6 +136,8 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
       </div>
     </td>
   );
-};
+});
+
+TimeSlotCell.displayName = 'TimeSlotCell';
 
 export default TimeSlotCell;
