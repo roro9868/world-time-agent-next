@@ -226,14 +226,41 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background transition-colors duration-300">
-        <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
+        <div className="container mx-auto px-2 xs:px-4 py-4 xs:py-6 sm:py-8 max-w-7xl">
           {/* Header */}
-          <div className="text-center mb-6 sm:mb-8 animate-fade-in">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <Globe className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">World Time Agent</h1>
+          <div className="text-center mb-8 sm:mb-12 animate-fade-in">
+            <div className="relative inline-block">
+              {/* Background gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-amber-500/20 rounded-2xl blur-xl transform scale-110"></div>
+              
+              {/* Main header content */}
+              <div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl px-4 xs:px-6 sm:px-8 py-4 xs:py-5 sm:py-6 shadow-lg">
+                <div className="flex items-center justify-center gap-3 xs:gap-4 mb-3">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-sm opacity-30"></div>
+                    <Globe className="relative h-8 xs:h-9 sm:h-10 w-8 xs:w-9 sm:w-10 text-primary drop-shadow-sm" />
+                  </div>
+                  <div className="text-center">
+                    <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent leading-tight">
+                      World Time
+                    </h1>
+                    <div className="text-sm xs:text-base sm:text-lg lg:text-xl font-semibold text-primary/80 -mt-1">
+                      Agent
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm sm:text-base font-medium">
+                  Track time across multiple timezones with precision
+                </p>
+                
+                {/* Decorative elements */}
+                <div className="flex justify-center gap-2 mt-4 opacity-30">
+                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  <div className="w-1 h-1 bg-primary rounded-full"></div>
+                </div>
+              </div>
             </div>
-            <p className="text-muted-foreground text-sm">Track time across multiple timezones</p>
           </div>
           
           {/* DateBar */}
@@ -274,18 +301,8 @@ export default function Home() {
                     items={locations.map((location) => location.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="overflow-x-auto w-full">
-                      <table className="w-full border-separate border-spacing-0 min-w-[800px]">
-                        <thead>
-                          <tr>
-                            <th className="sticky left-0 z-20 bg-card px-4 py-3 text-left font-medium text-muted-foreground border-b min-w-[200px]">
-                              Location
-                            </th>
-                            <th className="border-b px-2 text-center text-muted-foreground font-medium" colSpan={26}>
-                              Time Slots
-                            </th>
-                          </tr>
-                        </thead>
+                    <div className="overflow-x-auto w-full touch-pan-x">
+                      <table className="w-full border-separate border-spacing-0 min-w-[800px] sm:min-w-[1000px] lg:min-w-[1200px]">
                         <tbody>
                           {locations.map((location, rowIdx) => (
                             <TimeZoneRow
@@ -297,6 +314,7 @@ export default function Home() {
                               homeTimezone={homeTimezone}
                               anchorDate={anchorDate}
                               selectedUtcDate={selectedUtcDate || anchorDate}
+                              totalLocations={locations.length}
                             />
                           ))}
                           <LocationSelector

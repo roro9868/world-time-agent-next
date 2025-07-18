@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TimeSlotCell from '../TimeSlotCell';
-import { TimeSlot, TimeZone } from '../../types';
+import type { TimeSlot, TimeZone } from '../../types';
 import { formatInTimeZone } from 'date-fns-tz';
 
 const mockTimezone: TimeZone = {

@@ -16,6 +16,7 @@ interface TimeZoneRowProps {
   homeTimezone?: string;
   anchorDate: Date;
   selectedUtcDate: Date;
+  totalLocations: number;
 }
 
 // Extract header cell component for reusability
@@ -25,17 +26,18 @@ const TimeZoneHeaderCell: React.FC<{
   homeTimezone: string;
   onRemove: (id: string) => void;
   dragHandleProps?: any;
-}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps }) => (
+  totalLocations: number;
+}> = React.memo(({ location, isHome, homeTimezone, onRemove, dragHandleProps, totalLocations }) => (
   <td
-    className={`sticky left-0 z-20 px-4 py-3 align-top border-r border-border min-w-[200px] transition-colors group-hover:bg-muted/50 ${
+    className={`sticky left-0 z-20 px-2 xs:px-3 sm:px-4 py-2 xs:py-3 align-top border-r border-border min-w-[140px] xs:min-w-[160px] sm:min-w-[200px] max-w-[140px] xs:max-w-[160px] sm:max-w-[200px] transition-colors group-hover:bg-muted/50 ${
       isHome ? 'bg-muted/30' : 'bg-card'
-    }`}
+    } overflow-hidden`}
   >
-    <div className="flex items-start gap-2">
+    <div className="flex items-center gap-1 xs:gap-2">
       {/* Drag Handle */}
       <Button
         {...dragHandleProps}
-        className="cursor-grab active:cursor-grabbing shrink-0 h-6 w-6 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
+        className="cursor-grab active:cursor-grabbing shrink-0 h-5 xs:h-6 w-5 xs:w-6 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
         title="Drag to reorder"
         type="button"
         aria-label={`Drag ${location.timezone.city} to reorder`}
@@ -46,10 +48,10 @@ const TimeZoneHeaderCell: React.FC<{
         variant="ghost"
         size="icon"
       >
-        <GripVertical className="h-4 w-4" />
+        <GripVertical className="h-3 xs:h-4 w-3 xs:w-4" />
       </Button>
       <span
-        className="text-xl shrink-0"
+        className="text-base xs:text-lg sm:text-xl shrink-0"
         role="img"
         aria-label={`Flag of ${location.timezone.country}`}
       >
@@ -57,49 +59,58 @@ const TimeZoneHeaderCell: React.FC<{
       </span>
       <div className="flex flex-col min-w-0 flex-1">
         {/* First row: city + abbr + remove button */}
-        <div className="flex items-center min-w-0 gap-2">
-          <span className="text-sm font-semibold text-foreground truncate">
+        <div className="flex items-center min-w-0 gap-1 xs:gap-2">
+          <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
             {location.timezone.city}
           </span>
-          <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-medium whitespace-nowrap shrink-0">
+          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          {!isHome && (
-            <Button
-              onClick={() => onRemove(location.id)}
-              className="ml-auto shrink-0 h-5 w-5 p-0 text-muted-foreground hover:text-destructive transition-colors"
-              title="Remove location"
-              aria-label={`Remove ${location.timezone.city} from list`}
-              variant="ghost"
-              size="icon"
+          <Button
+            onClick={() => onRemove(location.id)}
+            disabled={totalLocations <= 1}
+            className={`ml-auto shrink-0 h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
+              totalLocations <= 1 
+                ? 'text-muted-foreground/30 cursor-not-allowed' 
+                : 'text-muted-foreground hover:text-destructive'
+            }`}
+            title={
+              totalLocations <= 1 
+                ? "Cannot remove the last location" 
+                : isHome 
+                  ? "Remove home location" 
+                  : "Remove location"
+            }
+            aria-label={`Remove ${location.timezone.city} from list`}
+            variant="ghost"
+            size="icon"
+          >
+            <svg
+              className="h-2 xs:h-3 w-2 xs:w-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
             >
-              <svg
-                className="h-3 w-3"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </Button>
-          )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </Button>
         </div>
         {/* Second row: country + current time */}
-        <div className="flex items-center text-xs text-muted-foreground mt-1">
-          <span className="truncate max-w-[140px]">
+        <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1">
+          <span className="truncate max-w-[80px] xs:max-w-[100px] sm:max-w-[140px]">
             {location.timezone.country}
           </span>
-          <span className="ml-2 text-primary font-semibold shrink-0">
+          <span className="ml-1 xs:ml-2 text-primary font-semibold shrink-0 text-[10px] xs:text-xs">
             {formatCurrentTimeInZone(location.timezone.name)}
           </span>
           {isHome && (
-            <span className="ml-2 px-1.5 py-0.5 bg-primary/10 text-primary text-[10px] font-medium rounded shrink-0">
+            <span className="ml-1 xs:ml-2 px-1 xs:px-1.5 py-0.5 bg-primary/10 text-primary text-[8px] xs:text-[10px] font-medium rounded shrink-0">
               Home
             </span>
           )}
@@ -118,6 +129,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     homeTimezone,
     anchorDate,
     selectedUtcDate,
+    totalLocations,
   }) => {
     const { timezone } = location;
     const isHomeRow = homeTimezone && timezone.name === homeTimezone;
@@ -161,6 +173,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
           homeTimezone={homeTimezone || ''}
           onRemove={onRemove}
           dragHandleProps={listeners}
+          totalLocations={totalLocations}
         />
         {/* Hour Slots */}
         {timeSlots.map((slot, colIdx) => (

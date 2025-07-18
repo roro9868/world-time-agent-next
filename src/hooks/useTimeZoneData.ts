@@ -290,7 +290,28 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
   );
 
   const removeLocation = useCallback((id: string) => {
-    setLocations((prev) => prev.filter((location) => location.id !== id));
+    setLocations((prev) => {
+      // If there's only one location, don't remove it
+      if (prev.length <= 1) {
+        return prev;
+      }
+
+      const locationIndex = prev.findIndex((location) => location.id === id);
+      if (locationIndex === -1) {
+        return prev; // Location not found
+      }
+
+      // If removing the home city (first in the list), ensure the next city becomes home
+      if (locationIndex === 0 && prev.length > 1) {
+        const newLocations = prev.filter((location) => location.id !== id);
+        // Update the new home city's ID to 'local' to maintain consistency
+        newLocations[0] = { ...newLocations[0], id: 'local' };
+        return newLocations;
+      }
+
+      // For non-home cities, just filter them out
+      return prev.filter((location) => location.id !== id);
+    });
   }, []);
 
   const updateLocations = useCallback((newLocations: Location[]) => {

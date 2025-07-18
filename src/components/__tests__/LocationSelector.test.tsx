@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LocationSelector } from '../LocationSelector';
-import { TimeZone } from '../../types';
+import type { TimeZone } from '../../types';
 
 // Mock city-timezones with the correct structure
 jest.mock('city-timezones', () => ({

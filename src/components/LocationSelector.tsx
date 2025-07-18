@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import ReactDOM from 'react-dom';
-import { Globe, GripVertical } from 'lucide-react';
+import { MapPin, GripVertical } from 'lucide-react';
 import cityTimezones from 'city-timezones';
 import type { TimeZone } from '../types';
 
@@ -242,7 +242,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             >
               <GripVertical className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
-            <Globe className="text-lg sm:text-xl w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
+            <MapPin className="text-lg sm:text-xl w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
             <div className="flex flex-col min-w-0 w-full">
               <div className="flex items-center min-w-0">
                 <input
@@ -274,7 +274,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   return (
     <tr className="border-b border-border">
       <td className="sticky left-0 z-10 bg-card px-4 py-3 align-top border-r border-border min-w-[200px]">
-        <div className="flex items-start gap-2 w-full">
+        <div className="flex items-center gap-2 w-full h-full py-1">
           <button
             aria-hidden="true"
             className="cursor-not-allowed shrink-0 h-6 w-6 p-0 text-muted-foreground opacity-30"
@@ -286,34 +286,28 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           >
             <GripVertical className="h-4 w-4" />
           </button>
-          <Globe className="h-5 w-5 text-muted-foreground shrink-0" />
-          <div className="flex flex-col min-w-0 flex-1">
-            <div className="flex items-center min-w-0 gap-2">
-              <input
-                aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
-                aria-autocomplete="list"
-                aria-controls="location-selector-dropdown"
-                aria-expanded={isFocused}
-                aria-label="Search for a city to add"
-                className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
-                placeholder="Add city..."
-                role="combobox"
-                type="text"
-                value={searchTerm}
-                onChange={handleInputChange}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-                onKeyDown={handleKeyDown}
-                ref={inputRef}
-              />
-              <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-medium whitespace-nowrap shrink-0">
-                ADD
-              </span>
-            </div>
-            <div className="text-xs text-muted-foreground mt-1">
-              <span className="truncate max-w-[140px]">{homeCity.country}</span>
-              <span className="ml-2 text-primary font-semibold">Search for cities to add</span>
-            </div>
+          <MapPin className="h-5 w-5 text-muted-foreground shrink-0" />
+          <div className="flex items-center min-w-0 flex-1 gap-2">
+            <input
+              aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
+              aria-autocomplete="list"
+              aria-controls="location-selector-dropdown"
+              aria-expanded={isFocused}
+              aria-label="Search for a city to add"
+              className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
+              placeholder="Add city..."
+              role="combobox"
+              type="text"
+              value={searchTerm}
+              onChange={handleInputChange}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+            />
+            <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-medium whitespace-nowrap shrink-0">
+              ADD
+            </span>
           </div>
         </div>
         {isFocused &&

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TimeZoneRow from '../TimeZoneRow';
-import { Location, TimeZone } from '../../types';
+import type { Location, TimeZone } from '../../types';
 
 // Mock the timeUtils functions
 // jest.mock('../../utils/timeUtils', () => ({
@@ -73,6 +73,7 @@ const defaultProps = {
   homeTimezone: 'America/New_York',
   anchorDate: new Date('2024-01-01T00:00:00Z'),
   selectedUtcDate: new Date('2024-01-01T12:00:00Z'),
+  totalLocations: 3,
 };
 
 describe('TimeZoneRow', () => {

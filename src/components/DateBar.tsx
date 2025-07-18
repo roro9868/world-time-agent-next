@@ -124,8 +124,8 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
       </Popover>
       
       {/* Month groups with date cells */}
-      <div className="flex-1 min-w-0">
-        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+      <div className="flex-1 min-w-0 max-w-fit">
+        <div className="flex gap-1 w-fit">
           {monthGroups.map((group) => {
             // Get the days for this month group
             const groupDays = days.slice(group.start, group.end + 1);

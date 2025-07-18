@@ -91,7 +91,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
   const styling = getTimeSlotStyling(slot, slot.isSelected, slot.isCurrent);
   
   return (
-    <td className="px-0.5 py-0 text-center align-middle relative">
+    <td className="px-0 py-0 text-center align-middle relative">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
         {/* Show date label for first column, or at every local midnight/12:30AM, overlapping the top of the button */}
         {showDateLabel && (
@@ -105,8 +105,8 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           variant={styling.variant}
           size="sm"
           className={`
-            min-w-0 w-8 sm:w-10 h-12 sm:h-14 px-0 py-1 rounded-md font-normal 
-            transition-all duration-200 flex flex-col items-center justify-center gap-0.5
+            min-w-0 w-5 xs:w-6 sm:w-8 h-8 xs:h-10 sm:h-12 px-0 py-0.5 rounded-sm font-normal text-[10px] xs:text-xs
+            transition-all duration-200 flex flex-col items-center justify-center gap-0
             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
             ${styling.className}
           `}
@@ -117,14 +117,14 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           <span
             className={
               timeLabel.includes(':')
-                ? 'text-xs leading-tight font-medium'
-                : 'text-sm leading-tight font-semibold'
+                ? 'text-[8px] xs:text-[10px] leading-none font-medium'
+                : 'text-[10px] xs:text-xs leading-none font-semibold'
             }
           >
             {timeLabel}
           </span>
           {ampm && (
-            <span className="text-[9px] leading-tight font-medium opacity-75 uppercase">
+            <span className="text-[6px] xs:text-[8px] leading-none font-medium opacity-75 uppercase">
               {ampm}
             </span>
           )}
