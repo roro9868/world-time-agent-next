@@ -1,23 +1,7 @@
 import { isWeekend, isToday } from 'date-fns';
 import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
-import { TimeSlot } from '../types';
-import moment from 'moment-timezone';
-
-/*
- * Timezone Abbreviation Strategy
- *
- * This project uses moment-timezone to obtain timezone abbreviations for IANA timezones.
- *
- * Approach:
- * 1. For a given IANA timezone, we use moment-timezone's .zoneAbbr() to get the abbreviation (e.g., 'EST', 'EDT', 'CST').
- * 2. If the abbreviation returned is a numeric offset (e.g., '+03', '+0700'), we display it in the form 'GMT+3' or 'GMT+7' for clarity.
- * 3. We do not use a fallback library (like spacetime) or a custom mapping, because:
- *    - All major JS timezone libraries ultimately rely on the IANA tz database, which does not provide friendly abbreviations for all zones.
- *    - Fallbacks or custom mappings can introduce ambiguity or require ongoing maintenance.
- * 4. This approach ensures that for most zones, users see familiar abbreviations, and for others, a clear GMT offset is shown.
- *
- * If you need to support custom or friendlier abbreviations for specific zones in the future, consider adding a small custom mapping for just those cases.
- */
+import type { TimeSlot } from '../types';
+import { getCurrentTimezoneAbbr, getTimezoneAbbrForDate } from './timezoneAbbr';
 
 // Always use the IANA time zone name (e.g., 'Asia/Shanghai') for all calculations. Ignore the offset/abbreviation for current time.
 export const formatTime = (date: Date, timeZone: string): string => {
@@ -100,71 +84,8 @@ export function generateAlignedTimeSlots(
   return slots;
 }
 
-// Helper to check if abbreviation is a numeric offset
-function isNumericAbbr(abbr: string): boolean {
-  return /^([+-]?\d{2,4}|UTC[+-]?\d{1,2})$/.test(abbr);
-}
-
-// Get current timezone abbreviation (e.g., 'EST' vs 'EDT')
-export const getCurrentTimezoneAbbr = (timeZone: string): string => {
-  const now = new Date();
-  try {
-    const abbr = moment.tz(now, timeZone).zoneAbbr();
-    if (!abbr || isNumericAbbr(abbr)) {
-      // Fallback to numeric offset if abbreviation is missing or numeric
-      const offset = moment.tz(now, timeZone).format('Z').replace(':', '');
-      return formatNumericAbbrAsGMT(
-        offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`,
-      );
-    }
-    return abbr;
-  } catch (e) {
-    // Fallback: return 'GMT'
-    return 'GMT';
-  }
-};
-
-// Get timezone abbreviation for a specific date
-export const getTimezoneAbbrForDate = (date: Date, timeZone: string): string => {
-  try {
-    const abbr = moment.tz(date, timeZone).zoneAbbr();
-    if (!abbr || isNumericAbbr(abbr)) {
-      const offset = moment.tz(date, timeZone).format('Z').replace(':', '');
-      return formatNumericAbbrAsGMT(
-        offset.startsWith('+') || offset.startsWith('-') ? offset : `+${offset}`,
-      );
-    }
-    return abbr;
-  } catch (e) {
-    return 'GMT';
-  }
-};
-
-// Format numeric abbreviation as GMT+X or GMT-X
-function formatNumericAbbrAsGMT(abbr: string): string {
-  // Handles +03, -07, +0700, -0300, etc.
-  const match = abbr.match(/^([+-])(\d{2})(\d{2})?$/);
-  if (match) {
-    const sign = match[1];
-    const hours = parseInt(match[2], 10);
-    const minutes = match[3] ? parseInt(match[3], 10) : 0;
-    let gmt = `GMT${sign}${hours}`;
-    if (minutes) {
-      gmt += `:${minutes.toString().padStart(2, '0')}`;
-    }
-    return gmt;
-  }
-  // Handles +07, -03, etc.
-  const matchShort = abbr.match(/^([+-])(\d{2})$/);
-  if (matchShort) {
-    return `GMT${matchShort[1]}${parseInt(matchShort[2], 10)}`;
-  }
-  // Handles UTC+X
-  if (/^UTC[+-]?\d{1,2}$/.test(abbr)) {
-    return abbr.replace('UTC', 'GMT');
-  }
-  return abbr;
-}
+// Re-export timezone abbreviation functions from our lightweight implementation
+export { getCurrentTimezoneAbbr, getTimezoneAbbrForDate };
 
 // Get current timezone offset in hours
 export const getCurrentTimezoneOffset = (timeZone: string): number => {

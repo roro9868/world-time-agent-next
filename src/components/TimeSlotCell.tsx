@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimeSlot, TimeZone } from '../types';
+import type { TimeSlot, TimeZone } from '../types';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getSlotBgColor } from '../utils/timeUtils';
 import { Button } from "./ui/button";
@@ -12,14 +12,33 @@ interface TimeSlotCellProps {
   onTimeSlotClick: (colIdx: number, utc: Date, localDate: Date, timezoneName: string) => void;
 }
 
-const getTimeSlotBackgroundColor = (
+const getTimeSlotStyling = (
   slot: TimeSlot,
   isSelected: boolean,
   isCurrent: boolean,
-): string => {
-  // Remove blue highlight for selected slot
-  if (isCurrent) return 'ring-2 ring-green-400';
-  return getSlotBgColor(slot.hour, slot.minute);
+): { className: string; variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined } => {
+  if (isSelected) {
+    return {
+      className: 'bg-primary text-primary-foreground hover:bg-primary/90',
+      variant: 'default'
+    };
+  }
+  
+  if (isCurrent) {
+    return {
+      className: 'bg-green-100 text-green-800 border-green-300 ring-2 ring-green-400/50 hover:bg-green-200',
+      variant: 'outline'
+    };
+  }
+
+  // Day/night background colors
+  const isDaytime = slot.hour >= 7 && slot.hour < 19;
+  const bgClass = isDaytime ? 'bg-amber-50/50 hover:bg-amber-100/70' : 'bg-blue-50/50 hover:bg-blue-100/70';
+  
+  return {
+    className: `${bgClass} hover:bg-accent hover:text-accent-foreground`,
+    variant: 'ghost' as const
+  };
 };
 
 const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
@@ -69,23 +88,27 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
     }
   };
 
+  const styling = getTimeSlotStyling(slot, slot.isSelected, slot.isCurrent);
+  
   return (
     <td className="px-0.5 py-0 text-center align-middle relative">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
         {/* Show date label for first column, or at every local midnight/12:30AM, overlapping the top of the button */}
         {showDateLabel && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[10px] font-semibold text-primary-700 pointer-events-none select-none whitespace-nowrap z-5">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[10px] font-semibold text-primary bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border">
             {formatInTimeZone(slot.utc, timezone.name, 'MMM d')}
           </div>
         )}
         <Button
           onClick={() => onTimeSlotClick(colIdx, slot.utc, slot.date, timezone.name)}
           onKeyDown={handleKeyDown}
-          variant="ghost"
-          className={`min-w-0 w-7 sm:w-9 px-0 py-2.5 rounded-md text-base font-normal transition-all duration-200 flex flex-col items-center justify-center gap-y-0
-            hover:bg-primary-50 focus:bg-primary-50
-            focus:outline-none focus:ring-0
-            transition-shadow transition-colors
+          variant={styling.variant}
+          size="sm"
+          className={`
+            min-w-0 w-8 sm:w-10 h-12 sm:h-14 px-0 py-1 rounded-md font-normal 
+            transition-all duration-200 flex flex-col items-center justify-center gap-0.5
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
+            ${styling.className}
           `}
           aria-label={ariaLabel}
           title={`${formattedTime} - Click to select`}
@@ -94,18 +117,14 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = ({
           <span
             className={
               timeLabel.includes(':')
-                ? 'text-xs sm:text-sm leading-none'
-                : 'text-sm sm:text-base leading-none'
+                ? 'text-xs leading-tight font-medium'
+                : 'text-sm leading-tight font-semibold'
             }
-            style={{ lineHeight: '1.05' }}
           >
             {timeLabel}
           </span>
           {ampm && (
-            <span
-              className="text-[10px] sm:text-xs leading-none -mt"
-              style={{ lineHeight: '1.05' }}
-            >
+            <span className="text-[9px] leading-tight font-medium opacity-75 uppercase">
               {ampm}
             </span>
           )}

@@ -78,16 +78,20 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
   }, [selectedDate, days.length]);
 
   return (
-    <div className="flex items-center space-x-3 w-full">
+    <div className="flex items-center gap-4 w-full">
       {/* Calendar Popover with shadcn/ui styling */}
       <Popover>
         <PopoverTrigger asChild>
-          <Button size="icon" className="w-12 h-12 p-0 bg-white hover:bg-gray-100 focus:bg-gray-100 transition-all duration-200 border-none shadow-none outline-none [&_svg]:!size-8">
-            <Calendar size={32} className="text-gray-700" />
+          <Button 
+            variant="outline" 
+            size="icon" 
+            className="shrink-0 h-10 w-10 border-input shadow-sm hover:bg-accent hover:text-accent-foreground"
+          >
+            <Calendar className="h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <div className="flex flex-col items-center">
+          <div className="p-3">
             <ShadcnCalendar
               mode="single"
               selected={selectedDate}
@@ -97,76 +101,78 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                   onDateChange(midnightInHomeTimezone);
                 }
               }}
-              initialFocus
+              defaultMonth={selectedDate}
               captionLayout="dropdown"
-              fromYear={2000}
-              toYear={2100}
+              startMonth={new Date(2000, 0)}
+              endMonth={new Date(2100, 11)}
             />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-2 w-full"
-              onClick={() => {
-                const todayMidnight = getHomeMidnightDate(new Date(), homeTimezone);
-                onDateChange(todayMidnight);
-              }}
-            >
-              Today
-            </Button>
+            <div className="border-t pt-3 mt-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => {
+                  const todayMidnight = getHomeMidnightDate(new Date(), homeTimezone);
+                  onDateChange(todayMidnight);
+                }}
+              >
+                Today
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
-      {/* Month groups with underline and date cells */}
+      
+      {/* Month groups with date cells */}
       <div className="flex-1 min-w-0">
-        <div className="flex w-full overflow-x-auto scrollbar-hide">
-          {monthGroups.map((group, i) => {
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+          {monthGroups.map((group) => {
             // Get the days for this month group
             const groupDays = days.slice(group.start, group.end + 1);
             return (
               <div
                 key={group.month}
-                className="flex flex-col items-center justify-end flex-shrink-0"
-                style={{
-                  minWidth: `${groupDays.length * 32}px`,
-                  marginRight: i === monthGroups.length - 1 ? 0 : '4px',
-                }}
+                className="flex flex-col items-center shrink-0"
               >
-                                  {/* Month label with underline */}
-                  <div className="w-full border-b-2 border-gray-300 flex flex-col items-center mb-0.5">
-                    <span className="text-xs sm:text-sm font-semibold text-gray-700 select-none tracking-wide">
-                      {group.month}
-                    </span>
-                  </div>
+                {/* Month label */}
+                <div className="w-full border-b border-border pb-1 mb-2">
+                  <span className="text-xs font-medium text-muted-foreground select-none tracking-wide block text-center">
+                    {group.month}
+                  </span>
+                </div>
+                
                 {/* Date cells for this month */}
-                <div className="flex w-full">
+                <div className="flex gap-1">
                   {groupDays.map((day, idx) => {
                     const isSelected = isSameDateInHomeTimezone(day, selectedDate, homeTimezone);
                     const isTodayDate = isTodayInHomeTimezone(day, homeTimezone);
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
-                    const isLast = idx === groupDays.length - 1 && i === monthGroups.length - 1;
+                    
                     return (
-                                              <Button
-                          key={group.start + idx}
-                          onClick={() => handleDayClick(day)}
-                          ref={isSelected ? selectedDayRef : undefined}
-                          variant={isSelected ? undefined : isTodayDate ? "outline" : "ghost"}
-                          className={`flex flex-col items-center px-1 py-1 rounded-md transition-all duration-200 min-w-[28px] h-auto${isLast ? '' : ' mr-1'}
-                            ${isSelected 
-                              ? 'bg-blue-600 text-white font-semibold hover:bg-blue-700' 
-                              : isTodayDate 
-                                ? 'border-2 border-blue-400 text-blue-700 font-semibold hover:border-blue-500 bg-blue-50/50' 
-                                : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                            }
-                            ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700' : ''}
-                          `}
-                        >
-                        <span className="text-xs sm:text-sm font-bold leading-tight">
+                      <Button
+                        key={group.start + idx}
+                        onClick={() => handleDayClick(day)}
+                        ref={isSelected ? selectedDayRef : undefined}
+                        variant={isSelected ? "default" : isTodayDate ? "outline" : "ghost"}
+                        size="sm"
+                        className={`
+                          flex flex-col items-center justify-center h-14 w-10 p-1 text-center
+                          ${isSelected 
+                            ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                            : isTodayDate 
+                              ? 'border-primary text-primary hover:bg-primary/10' 
+                              : 'hover:bg-accent hover:text-accent-foreground'
+                          }
+                          ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50' : ''}
+                        `}
+                      >
+                        <span className="text-sm font-semibold leading-none">
                           {dayNumber}
                         </span>
-                                                  <span className="text-[8px] sm:text-[10px] font-medium leading-none -mt-2">
-                            {weekday}
-                          </span>
+                        <span className="text-[10px] font-medium leading-none mt-1 opacity-70">
+                          {weekday}
+                        </span>
                       </Button>
                     );
                   })}

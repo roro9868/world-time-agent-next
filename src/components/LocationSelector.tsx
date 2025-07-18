@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import ReactDOM from 'react-dom';
 import { Globe, GripVertical } from 'lucide-react';
 import cityTimezones from 'city-timezones';
-import { TimeZone } from '../types';
+import type { TimeZone } from '../types';
 
 interface LocationSelectorProps {
   onAddLocation: (timezone: TimeZone) => void;
@@ -272,31 +272,31 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   }
 
   return (
-    <tr>
-      <td className="sticky left-0 z-10 bg-white px-2 sm:px-4 py-1 sm:py-2 align-top border-r border-gray-100 min-w-[100px] whitespace-nowrap truncate">
-        <div className="flex items-start space-x-1 sm:space-x-2 w-full">
+    <tr className="border-b border-border">
+      <td className="sticky left-0 z-10 bg-card px-4 py-3 align-top border-r border-border min-w-[200px]">
+        <div className="flex items-start gap-2 w-full">
           <button
             aria-hidden="true"
-            className="cursor-grab p-0.5 sm:p-1 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none touch-none"
+            className="cursor-not-allowed shrink-0 h-6 w-6 p-0 text-muted-foreground opacity-30"
             disabled
             style={{ pointerEvents: 'none' }}
             tabIndex={-1}
             title="Drag handle (disabled)"
             type="button"
           >
-            <GripVertical className="w-3 h-3 sm:w-4 sm:h-4" />
+            <GripVertical className="h-4 w-4" />
           </button>
-          <Globe className="text-lg sm:text-xl w-5 h-5 sm:w-6 sm:h-6 text-gray-400 flex-shrink-0" />
-          <div className="flex flex-col min-w-0 w-full">
-            <div className="flex items-center min-w-0">
+          <Globe className="h-5 w-5 text-muted-foreground shrink-0" />
+          <div className="flex flex-col min-w-0 flex-1">
+            <div className="flex items-center min-w-0 gap-2">
               <input
                 aria-activedescendant={matches.length > 0 ? `option-${activeIndex}` : undefined}
                 aria-autocomplete="list"
                 aria-controls="location-selector-dropdown"
                 aria-expanded={isFocused}
                 aria-label="Search for a city to add"
-                className="bg-transparent border border-gray-200 rounded px-1.5 sm:px-2 py-0.5 text-xs sm:text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 max-w-[120px] sm:max-w-[140px] min-w-0 placeholder-gray-900"
-                placeholder="Add City"
+                className="flex-1 bg-transparent border border-input rounded-md px-2 py-1 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 min-w-0"
+                placeholder="Add city..."
                 role="combobox"
                 type="text"
                 value={searchTerm}
@@ -306,13 +306,13 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 onKeyDown={handleKeyDown}
                 ref={inputRef}
               />
-              <span className="ml-1 sm:ml-2 px-1 py-0.5 rounded bg-gray-100 text-[8px] sm:text-[10px] font-semibold text-gray-500 align-middle whitespace-nowrap">
-                TZ
+              <span className="px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[10px] font-medium whitespace-nowrap shrink-0">
+                ADD
               </span>
             </div>
-            <div className="flex items-center text-[10px] sm:text-xs text-gray-500 whitespace-nowrap overflow-ellipsis overflow-hidden max-w-[200px] sm:max-w-[220px]">
-              <span className="truncate max-w-70 sm:max-w-[140px]">{homeCity.country}</span>
-              <span className="ml-1 sm:ml-2 text-primary-700 font-bold">Current time</span>
+            <div className="text-xs text-muted-foreground mt-1">
+              <span className="truncate max-w-[140px]">{homeCity.country}</span>
+              <span className="ml-2 text-primary font-semibold">Search for cities to add</span>
             </div>
           </div>
         </div>
@@ -320,12 +320,12 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           ReactDOM.createPortal(
             <div
               id="location-selector-dropdown"
-              className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+              className="fixed z-50 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto"
               style={{
                 left: dropdownPos.left,
                 top: dropdownPos.top,
                 width: dropdownPos.width,
-                minWidth: '280px',
+                minWidth: '320px',
               }}
               ref={dropdownRef}
             >
@@ -334,34 +334,34 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                   <button
                     key={`${entry.name}:${entry.city}`}
                     aria-selected={index === activeIndex}
-                    className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none ${index === activeIndex ? 'bg-gray-100' : ''}`}
+                    className={`w-full px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                      index === activeIndex ? 'bg-accent text-accent-foreground' : ''
+                    }`}
                     id={`option-${index}`}
                     onClick={handleOptionClick(entry)}
                     onMouseDown={handleOptionMouseDown}
                     role="option"
                     type="button"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-                        <span className="text-base sm:text-lg">{entry.flag}</span>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm sm:text-base font-semibold text-gray-900 truncate">
-                            {entry.city}
-                          </span>
-                          <span className="text-[10px] sm:text-xs text-gray-500 truncate max-w-[160px] sm:max-w-[180px]">
-                            {entry.country} • {entry.name}
-                          </span>
-                        </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg shrink-0">{entry.flag}</span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-semibold text-foreground truncate">
+                          {entry.city}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {entry.country} • {entry.name}
+                        </span>
                       </div>
                     </div>
                   </button>
                 ))
               ) : notFound ? (
-                <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500">
+                <div className="px-3 py-2 text-sm text-muted-foreground">
                   No cities found
                 </div>
               ) : (
-                <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-500">
+                <div className="px-3 py-2 text-sm text-muted-foreground">
                   Start typing to search...
                 </div>
               )}
@@ -369,6 +369,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             document.body,
           )}
       </td>
+      <td colSpan={26} className="p-0"></td>
     </tr>
   );
 };

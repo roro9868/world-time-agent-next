@@ -12,11 +12,10 @@ import {
   formatDateForDisplay,
 } from '../timeUtils';
 
-// Mock moment-timezone
-jest.mock('moment-timezone', () => ({
-  tz: jest.fn(() => ({
-    zoneAbbr: jest.fn(() => 'EST'),
-  })),
+// Mock our timezone abbreviation module
+jest.mock('../timezoneAbbr', () => ({
+  getCurrentTimezoneAbbr: jest.fn(() => 'EST'),
+  getTimezoneAbbrForDate: jest.fn(() => 'EST'),
 }));
 
 describe('timeUtils', () => {

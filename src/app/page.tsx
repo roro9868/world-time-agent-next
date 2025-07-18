@@ -1,9 +1,8 @@
 'use client';
 import React, { useRef, useCallback, useLayoutEffect, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Globe, Clock } from 'lucide-react';
 import { LocationSelector } from '@/components/LocationSelector';
-import { Location } from '@/types';
+import type { Location } from '@/types';
 import { generateAlignedTimeSlots } from '@/utils/timeUtils';
 import { DateBar } from '@/components/DateBar';
 import TimeZoneRow from '@/components/TimeZoneRow';
@@ -15,7 +14,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
+  type DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -226,22 +225,20 @@ export default function Home() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen transition-colors duration-300">
-        <div className="mx-auto pl-1 pr-1 sm:pl-2 sm:pr-2 py-4 sm:py-8">
+      <div className="min-h-screen bg-background transition-colors duration-300">
+        <div className="container mx-auto px-4 py-6 sm:py-8 max-w-7xl">
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-4 sm:mb-8"
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
-              <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">World Time Agent</h1>
+          <div className="text-center mb-6 sm:mb-8 animate-fade-in">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Globe className="h-8 w-8 text-primary" />
+              <h1 className="text-3xl sm:text-4xl font-bold text-foreground">World Time Agent</h1>
             </div>
-          </motion.div>
-          {/* DateBar - center aligned */}
-          <div className="mb-2 sm:mb-4 flex justify-center">
-            <div className="min-w-[280px] sm:min-w-[320px] max-w-full bg-white rounded-xl shadow px-2 sm:px-4 py-1 sm:py-2 overflow-x-auto whitespace-nowrap">
+            <p className="text-muted-foreground text-sm">Track time across multiple timezones</p>
+          </div>
+          
+          {/* DateBar */}
+          <div className="mb-6 flex justify-center">
+            <div className="w-full max-w-4xl bg-card border rounded-lg shadow-sm p-4">
               <DateBar
                 selectedDate={selectedTime}
                 onDateChange={handleDateChange}
@@ -249,9 +246,10 @@ export default function Home() {
               />
             </div>
           </div>
+          
           {/* Time Zone Table Layout */}
           <div className="flex justify-center">
-            <div className="max-w-[1400px] bg-white rounded-xl shadow-lg relative overflow-hidden">
+            <div className="w-full max-w-6xl bg-card border rounded-lg shadow-sm relative overflow-hidden">
               <div ref={tableRef}>
                 {/* Overlay for selected time column */}
                 {overlayStyle && (
@@ -276,12 +274,16 @@ export default function Home() {
                     items={locations.map((location) => location.id)}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="overflow-x-auto scrollbar-thin w-full max-w-full pr-2 sm:pr-4">
-                      <table className="w-full table-auto border-separate border-spacing-y-0 min-w-[800px] sm:min-w-[1000px] max-w-[1400px]">
+                    <div className="overflow-x-auto w-full">
+                      <table className="w-full border-separate border-spacing-0 min-w-[800px]">
                         <thead>
                           <tr>
-                            <th className="sticky left-0 z-20 bg-white px-2 sm:px-4 py-1 sm:py-2 text-left font-semibold text-gray-700 whitespace-nowrap align-middle min-w-[100px] max-w-[220px] w-auto truncate"></th>
-                            <th colSpan={26} className="p-0 align-middle"></th>
+                            <th className="sticky left-0 z-20 bg-card px-4 py-3 text-left font-medium text-muted-foreground border-b min-w-[200px]">
+                              Location
+                            </th>
+                            <th className="border-b px-2 text-center text-muted-foreground font-medium" colSpan={26}>
+                              Time Slots
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -311,15 +313,15 @@ export default function Home() {
           </div>
           {/* Empty State */}
           {locations.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No locations added</h3>
-              <p className="text-gray-600">Add your first location to get started</p>
-            </motion.div>
+            <div className="flex flex-col items-center justify-center py-12 animate-fade-in">
+              <div className="bg-muted/50 rounded-full p-4 mb-4">
+                <Clock className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">No locations added</h3>
+              <p className="text-muted-foreground text-center max-w-sm">
+                Add your first location to start tracking time across different timezones
+              </p>
+            </div>
           )}
         </div>
       </div>
