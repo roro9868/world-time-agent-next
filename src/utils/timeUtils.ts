@@ -131,7 +131,7 @@ export function generateDateRange(startDate: Date, count: number, homeTimezone?:
 }
 
 export function groupByMonth(dates: Date[]): Array<{ month: string; start: number; end: number }> {
-  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   const groups: Array<{ month: string; start: number; end: number }> = [];
   let currentMonthIdx = -1;
   let startIndex = 0;

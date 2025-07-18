@@ -209,8 +209,8 @@ export default function Home() {
                       <table className="w-full border-separate border-spacing-0 min-w-[900px] sm:min-w-[1100px] lg:min-w-[1300px]">
                         <tbody>
                           {/* DateBar Header Row */}
-                          <tr className="border-b border-border bg-muted/30">
-                            <td className="sticky left-0 z-10 bg-muted px-1 xs:px-2 py-2 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
+                          <tr className="border-b border-border bg-white">
+                            <td className="sticky left-0 z-10 bg-white px-1 xs:px-2 py-2 border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px]">
                               <div className="flex items-center justify-center">
                                 <LocationSelector
                                   onAddLocation={memoizedAddLocation}

@@ -32,7 +32,7 @@ const TimeZoneHeaderCell: React.FC<{
   return (
   <td
     className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[110px] xs:min-w-[125px] sm:min-w-[140px] transition-colors group-hover:bg-muted ${
-      isHome ? 'bg-muted' : 'bg-card'
+      isHome ? 'bg-blue-50' : 'bg-card'
     } overflow-hidden`}
   >
     <div className="flex items-center gap-0.5 xs:gap-1">
@@ -164,7 +164,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         ref={setNodeRef}
         style={style}
         className={`group hover:bg-muted/30 transition-colors border-b border-border ${
-          isHomeRow ? 'bg-muted/20 border-l-4 border-l-primary' : ''
+          isHomeRow ? 'bg-blue-50/50 border-l-4 border-l-primary' : ''
         } ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
         aria-label={`Time zone row for ${location.timezone.city}`}
         {...attributes}
