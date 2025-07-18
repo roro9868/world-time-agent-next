@@ -7,6 +7,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 import { generateAlignedTimeSlots } from '../utils/timeUtils';
 import { Button } from './ui/button';
+import { Home as HomeIcon } from 'lucide-react';
 
 interface TimeZoneRowProps {
   location: Location;
@@ -35,32 +36,65 @@ const TimeZoneHeaderCell: React.FC<{
       isHome ? 'bg-blue-50' : 'bg-card'
     } overflow-hidden`}
   >
-    <div className="flex items-center gap-0.5 xs:gap-1">
-      {/* Drag Handle */}
-      <Button
-        {...dragHandleProps}
-        className="cursor-grab active:cursor-grabbing shrink-0 h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
-        title="Drag to reorder"
-        type="button"
-        aria-label={`Drag ${location.timezone.city} to reorder`}
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          dragHandleProps?.onMouseDown?.(e);
-        }}
-        variant="ghost"
-        size="icon"
-      >
-        <GripVertical className="h-3 w-3" />
-      </Button>
-      <span
-        className="text-base xs:text-lg sm:text-xl shrink-0"
-        role="img"
-        aria-label={`Flag of ${location.timezone.country}`}
-      >
-        {location.timezone.flag}
-      </span>
+    <div className="flex items-start gap-0.5 xs:gap-1">
+      {/* Left column: Drag Handle and Remove Button */}
+      <div className="flex flex-col items-center gap-0.5 shrink-0">
+        {/* Drag Handle */}
+        <Button
+          {...dragHandleProps}
+          className="cursor-grab active:cursor-grabbing h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
+          title="Drag to reorder"
+          type="button"
+          aria-label={`Drag ${location.timezone.city} to reorder`}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            dragHandleProps?.onMouseDown?.(e);
+          }}
+          variant="ghost"
+          size="icon"
+        >
+          <GripVertical className="h-3 w-3" />
+        </Button>
+        {/* Remove Button */}
+        <Button
+          onClick={() => onRemove(location.id)}
+          disabled={totalLocations <= 1}
+          className={`h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
+            totalLocations <= 1 
+              ? 'text-muted-foreground/30 cursor-not-allowed' 
+              : 'text-muted-foreground hover:text-destructive'
+          }`}
+          title={
+            totalLocations <= 1 
+              ? "Cannot remove the last location" 
+              : isHome 
+                ? "Remove home location" 
+                : "Remove location"
+          }
+          aria-label={`Remove ${location.timezone.city} from list`}
+          variant="ghost"
+          size="icon"
+        >
+          <svg
+            className="h-2 xs:h-3 w-2 xs:w-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </Button>
+      </div>
+      
+      {/* Right column: City info */}
       <div className="flex flex-col min-w-0 flex-1">
-        {/* First row: city + abbr + home + remove button */}
+        {/* First row: city + abbr + home */}
         <div className="flex items-center min-w-0 gap-1">
           <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
             {location.timezone.city}
@@ -69,51 +103,21 @@ const TimeZoneHeaderCell: React.FC<{
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
           {isHome && (
-            <span className="px-1 xs:px-1.5 py-0.5 bg-teal-100 text-teal-700 text-[8px] xs:text-[10px] font-medium rounded shrink-0">
-              Home
+            <span className="ml-1 flex items-center">
+              <HomeIcon className="w-4 h-4 text-yellow-500" strokeWidth={2.2} />
             </span>
           )}
-          <Button
-            onClick={() => onRemove(location.id)}
-            disabled={totalLocations <= 1}
-            className={`ml-auto shrink-0 h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
-              totalLocations <= 1 
-                ? 'text-muted-foreground/30 cursor-not-allowed' 
-                : 'text-muted-foreground hover:text-destructive'
-            }`}
-            title={
-              totalLocations <= 1 
-                ? "Cannot remove the last location" 
-                : isHome 
-                  ? "Remove home location" 
-                  : "Remove location"
-            }
-            aria-label={`Remove ${location.timezone.city} from list`}
-            variant="ghost"
-            size="icon"
-          >
-            <svg
-              className="h-2 xs:h-3 w-2 xs:w-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </Button>
         </div>
-        {/* Second row: country + current time */}
+        {/* Second row: flag + current time */}
         <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1">
-          <span className="truncate max-w-[60px] xs:max-w-[70px] sm:max-w-[80px]" title={location.timezone.country}>
-            {location.timezone.country.length > 12 ? location.timezone.country.substring(0, 12) + '...' : location.timezone.country}
+          <span
+            className="text-base xs:text-lg shrink-0 mr-1"
+            role="img"
+            aria-label={`Flag of ${location.timezone.country}`}
+          >
+            {location.timezone.flag}
           </span>
-          <span className="ml-1 xs:ml-2 text-slate-700 font-semibold shrink-0 text-[10px] xs:text-xs">
+          <span className="text-slate-700 font-semibold shrink-0 text-[10px] xs:text-xs">
             {formatCurrentTimeInZone(location.timezone.name)}
           </span>
         </div>
