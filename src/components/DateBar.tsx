@@ -3,6 +3,7 @@ import { toZonedTime } from 'date-fns-tz';
 import { isWeekend } from 'date-fns';
 import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
 import { Button } from "./ui/button";
+import { Calendar } from 'lucide-react';
 
 interface DateBarProps {
   selectedDate: Date;
@@ -79,53 +80,67 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
     <div className="flex items-center justify-between w-full gap-4">
       {/* Month groups with date cells */}
       <div className="flex-1 min-w-0 max-w-fit overflow-x-auto">
-        <div className="flex gap-1 w-fit">
+        <div className="flex gap-1 w-fit items-center">
+          {/* Calendar icon cell as a clickable button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex flex-col items-center justify-center h-12 w-10 p-1 mt-3.5 text-center text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
+            aria-label="Open calendar"
+            onClick={() => { /* TODO: open calendar picker */ }}
+          >
+            <Calendar className="h-6 w-6" />
+          </Button>
           {monthGroups.map((group) => {
             // Get the days for this month group
             const groupDays = days.slice(group.start, group.end + 1);
             return (
               <div
                 key={group.month}
-                className="flex flex-col items-center shrink-0"
+                className="flex flex-col items-center shrink-0 relative"
               >
-                {/* Month label */}
-                <div className="w-full border-b border-border pb-1 mb-2">
-                  <span className="text-xs font-medium text-muted-foreground select-none tracking-wide block text-center">
-                    {group.month}
-                  </span>
-                </div>
                 {/* Date cells for this month */}
-                <div className="flex gap-1">
+                <div className="flex gap-1 mt-5">
                   {groupDays.map((day, idx) => {
                     const isSelected = isSameDateInHomeTimezone(day, selectedDate, homeTimezone);
                     const isTodayDate = isTodayInHomeTimezone(day, homeTimezone);
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
+
+                    // Show the month label above the first visible day of the month in the group
+                    const shouldShowMonthLabel = idx === 0 || day.getDate() === 1;
+
                     return (
-                      <Button
-                        key={group.start + idx}
-                        onClick={() => handleDayClick(day)}
-                        ref={isSelected ? selectedDayRef : undefined}
-                        variant={isSelected ? "default" : isTodayDate ? "outline" : "ghost"}
-                        size="sm"
-                        className={`
-                          flex flex-col items-center justify-center h-12 w-10 p-1 text-center
-                          ${isSelected 
-                            ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                            : isTodayDate 
-                              ? 'border-primary text-primary hover:bg-primary/10' 
-                              : 'hover:bg-accent hover:text-accent-foreground'
-                          }
-                          ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50' : ''}
-                        `}
-                      >
-                        <span className="text-sm font-semibold leading-none">
-                          {dayNumber}
-                        </span>
-                        <span className="text-[10px] font-medium leading-none mt-1 opacity-70">
-                          {weekday}
-                        </span>
-                      </Button>
+                      <div key={group.start + idx} className="relative">
+                        {shouldShowMonthLabel && (
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-primary bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border">
+                            {group.month}
+                          </div>
+                        )}
+                        <Button
+                          onClick={() => handleDayClick(day)}
+                          ref={isSelected ? selectedDayRef : undefined}
+                          variant={isSelected ? "default" : isTodayDate ? "outline" : "ghost"}
+                          size="sm"
+                          className={`
+                            flex flex-col items-center justify-center h-12 w-10 p-1 text-center
+                            ${isSelected 
+                              ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                              : isTodayDate 
+                                ? 'border-primary text-primary hover:bg-primary/10' 
+                                : 'hover:bg-accent hover:text-accent-foreground'
+                            }
+                            ${isWeekendDay && !isSelected && !isTodayDate ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50' : ''}
+                          `}
+                        >
+                          <span className="text-sm font-semibold leading-none">
+                            {dayNumber}
+                          </span>
+                          <span className="text-[10px] font-medium leading-none mt-1 opacity-70">
+                            {weekday}
+                          </span>
+                        </Button>
+                      </div>
                     );
                   })}
                 </div>
