@@ -188,14 +188,22 @@ export function isSlotMidnight(slot: { hour: number; minute: number }): boolean 
 }
 
 // Date helper functions (moved from dateHelpers.ts)
-export function generateDateRange(startDate: Date, count: number): Date[] {
+export function generateDateRange(startDate: Date, count: number, homeTimezone?: string): Date[] {
   const dates: Date[] = [];
   for (let i = 0; i < count; i++) {
-    const date = new Date(Date.UTC(
-      startDate.getUTCFullYear(),
-      startDate.getUTCMonth(),
-      startDate.getUTCDate() + i,
-    ));
+    let date: Date;
+    if (homeTimezone) {
+      // Use the home timezone to get the correct local date
+      const base = toZonedTime(startDate, homeTimezone);
+      date = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+    } else {
+      // Fallback to UTC (legacy behavior)
+      date = new Date(Date.UTC(
+        startDate.getUTCFullYear(),
+        startDate.getUTCMonth(),
+        startDate.getUTCDate() + i,
+      ));
+    }
     dates.push(date);
   }
   return dates;

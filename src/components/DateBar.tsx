@@ -13,33 +13,41 @@ interface DateBarProps {
   homeTimezone: string;
 }
 
-// Helper to get a Date object for midnight in the home timezone (timezone-aware, robust polyfill for zonedTimeToUtc)
+// Helper to get a Date object for midnight in the home timezone
 function getHomeMidnightDate(date: Date, homeTimezone: string): Date {
-  const zoned = toZonedTime(date, homeTimezone);
-  const year = zoned.getFullYear();
-  const month = zoned.getMonth();
-  const day = zoned.getDate();
-  const utcMidnight = new Date(Date.UTC(year, month, day, 0, 0, 0));
-  const offsetMinutes = -toZonedTime(utcMidnight, homeTimezone).getTimezoneOffset();
-  return new Date(utcMidnight.getTime() - offsetMinutes * 60 * 1000);
+  // Convert the date to the home timezone, then set to midnight
+  const zonedDate = toZonedTime(date, homeTimezone);
+  return new Date(zonedDate.getFullYear(), zonedDate.getMonth(), zonedDate.getDate());
+}
+
+// Helper to compare dates in home timezone context
+function isSameDateInHomeTimezone(date1: Date, date2: Date, homeTimezone: string): boolean {
+  const midnight1 = getHomeMidnightDate(date1, homeTimezone);
+  const midnight2 = getHomeMidnightDate(date2, homeTimezone);
+  return midnight1.getTime() === midnight2.getTime();
+}
+
+// Helper to check if a date is today in home timezone
+function isTodayInHomeTimezone(date: Date, homeTimezone: string): boolean {
+  const today = new Date();
+  return isSameDateInHomeTimezone(date, today, homeTimezone);
 }
 
 export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, homeTimezone }) => {
   const selectedDayRef = useRef<HTMLButtonElement>(null);
 
-  // Calculate the start of the day in the home timezone (timezone-aware, robust)
+  // Calculate the start of the day in the home timezone
   const startOfHomeDay = getHomeMidnightDate(selectedDate, homeTimezone);
 
   // Generate 9 days centered on the selected date (4 before + selected + 4 after)
   const centerDate = new Date(startOfHomeDay.getTime());
-  const days = generateDateRange(new Date(centerDate.getTime() - 4 * 24 * 60 * 60 * 1000), 9);
+  const days = generateDateRange(new Date(centerDate.getTime() - 4 * 24 * 60 * 60 * 1000), 9, homeTimezone);
   const monthGroups = groupByMonth(days);
 
   const handleDayClick = (date: Date) => {
-    // Always set time to midnight in home timezone for the selected date
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    onDateChange(d);
+    // Create a date at midnight in the home timezone for the selected date
+    const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
+    onDateChange(midnightInHomeTimezone);
   };
 
   // Robust scroll-into-view: double rAF, plus fallback retry if ref not ready
@@ -83,7 +91,12 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
             <ShadcnCalendar
               mode="single"
               selected={selectedDate}
-              onSelect={(date) => date && onDateChange(date)}
+              onSelect={(date) => {
+                if (date) {
+                  const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
+                  onDateChange(midnightInHomeTimezone);
+                }
+              }}
               initialFocus
               captionLayout="dropdown"
               fromYear={2000}
@@ -93,7 +106,10 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
               variant="ghost"
               size="sm"
               className="mt-2 w-full"
-              onClick={() => onDateChange(new Date())}
+              onClick={() => {
+                const todayMidnight = getHomeMidnightDate(new Date(), homeTimezone);
+                onDateChange(todayMidnight);
+              }}
             >
               Today
             </Button>
@@ -124,10 +140,8 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                 {/* Date cells for this month */}
                 <div className="flex w-full">
                   {groupDays.map((day, idx) => {
-                    const isSelected =
-                      toZonedTime(day, homeTimezone).toDateString() ===
-                      toZonedTime(selectedDate, homeTimezone).toDateString();
-                    const isTodayDate = isToday(day);
+                    const isSelected = isSameDateInHomeTimezone(day, selectedDate, homeTimezone);
+                    const isTodayDate = isTodayInHomeTimezone(day, homeTimezone);
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
                     const isLast = idx === groupDays.length - 1 && i === monthGroups.length - 1;
