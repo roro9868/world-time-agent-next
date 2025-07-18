@@ -1,11 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { Calendar } from 'lucide-react';
 import { toZonedTime } from 'date-fns-tz';
-import { isToday, isWeekend } from 'date-fns';
+import { isWeekend } from 'date-fns';
 import { generateDateRange, groupByMonth, formatDateForDisplay } from '../utils/timeUtils';
 import { Button } from "./ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Calendar as ShadcnCalendar } from "./ui/calendar";
+import { DatePicker } from "./ui/date-picker";
 
 interface DateBarProps {
   selectedDate: Date;
@@ -79,50 +77,18 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
 
   return (
     <div className="flex items-center gap-4 w-full">
-      {/* Calendar Popover with shadcn/ui styling */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="shrink-0 h-10 w-10 border-input shadow-sm hover:bg-accent hover:text-accent-foreground"
-          >
-            <Calendar className="h-4 w-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-3">
-            <ShadcnCalendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => {
-                if (date) {
-                  const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
-                  onDateChange(midnightInHomeTimezone);
-                }
-              }}
-              defaultMonth={selectedDate}
-              captionLayout="dropdown"
-              startMonth={new Date(2000, 0)}
-              endMonth={new Date(2100, 11)}
-            />
-            <div className="border-t pt-3 mt-3">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                onClick={() => {
-                  const todayMidnight = getHomeMidnightDate(new Date(), homeTimezone);
-                  onDateChange(todayMidnight);
-                }}
-              >
-                Today
-              </Button>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-      
+      {/* DatePicker icon button popover */}
+      <DatePicker
+        date={selectedDate}
+        onDateChange={(date) => {
+          if (date) {
+            const midnightInHomeTimezone = getHomeMidnightDate(date, homeTimezone);
+            onDateChange(midnightInHomeTimezone);
+          }
+        }}
+        fromYear={2000}
+        toYear={2100}
+      />
       {/* Month groups with date cells */}
       <div className="flex-1 min-w-0 max-w-fit">
         <div className="flex gap-1 w-fit">
@@ -140,7 +106,6 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                     {group.month}
                   </span>
                 </div>
-                
                 {/* Date cells for this month */}
                 <div className="flex gap-1">
                   {groupDays.map((day, idx) => {
@@ -148,7 +113,6 @@ export const DateBar: React.FC<DateBarProps> = ({ selectedDate, onDateChange, ho
                     const isTodayDate = isTodayInHomeTimezone(day, homeTimezone);
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
-                    
                     return (
                       <Button
                         key={group.start + idx}
