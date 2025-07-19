@@ -239,6 +239,7 @@ export default function Home() {
     url.searchParams.set('selectedUtcDate', selectedUtcDate?.toISOString() || selectedTime.toISOString());
     url.searchParams.set('anchorDate', anchorDate.toISOString());
     url.searchParams.set('homeTimezone', homeTimezone);
+    url.searchParams.set('darkMode', isDarkMode.toString());
     
     // Copy to clipboard with error handling
     safeClipboardWrite(url.toString()).then((success: boolean) => {
@@ -248,7 +249,7 @@ export default function Home() {
         showToast('Failed to copy link to clipboard', 'error');
       }
     });
-  }, [locations, selectedTime, selectedUtcDate, anchorDate, homeTimezone, showToast]);
+  }, [locations, selectedTime, selectedUtcDate, anchorDate, homeTimezone, isDarkMode, showToast]);
 
   if (!isInitialized && (!locations || locations.length === 0)) {
     return <div style={{ color: 'gray', textAlign: 'center', marginTop: 40 }}>Loading...</div>;
