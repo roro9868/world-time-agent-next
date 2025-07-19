@@ -12,7 +12,6 @@ export interface TimeSlot {
   time: string;
   date: Date;
   utc: Date;
-  isCurrent: boolean;
   isSelected: boolean;
   isWeekend: boolean;
   isMidnight: boolean;
@@ -23,10 +22,4 @@ export interface Location {
   timezone: TimeZone;
   currentTime: Date;
   timeSlots: TimeSlot[];
-}
-
-export interface AppState {
-  locations: Location[];
-  selectedTime: Date;
-  showWeekends: boolean;
 }

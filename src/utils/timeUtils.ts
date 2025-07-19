@@ -83,7 +83,6 @@ export function generateAlignedTimeSlots(
       time: formatTime(localDate, targetTimezone),
       date: localDate,
       utc: utcSlot,
-      isCurrent: false, // Always false since we removed current time highlighting
       isSelected,
       isWeekend: isWeekendDay,
       isMidnight,
@@ -105,41 +104,6 @@ export const getTimezoneOffset = (timezone: string): number => {
   const minute = localTime.getMinutes();
   return hour - utcHour + (minute - utcMinute) / 60;
 };
-
-// Utility: getSlotBgColor
-export function getSlotBgColor(hour: number, minute: number): string {
-  const totalMinutes = hour * 60 + minute;
-  // Day: 7:00 AM (420 minutes) to 6:59 PM (1139 minutes)
-  const isDaytime = totalMinutes >= 420 && totalMinutes < 1140;
-  return isDaytime ? 'bg-amber-50' : 'bg-blue-50';
-}
-
-// Returns true if the slot is at midnight (any minute)
-export function isSlotMidnight(slot: { hour: number; minute: number }): boolean {
-  return slot.hour === 0;
-}
-
-// Date helper functions (moved from dateHelpers.ts)
-export function generateDateRange(startDate: Date, count: number, homeTimezone?: string): Date[] {
-  const dates: Date[] = [];
-  for (let i = 0; i < count; i++) {
-    let date: Date;
-    if (homeTimezone) {
-      // Use the home timezone to get the correct local date
-      const base = toZonedTime(startDate, homeTimezone);
-      date = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
-    } else {
-      // Fallback to UTC (legacy behavior)
-      date = new Date(Date.UTC(
-        startDate.getUTCFullYear(),
-        startDate.getUTCMonth(),
-        startDate.getUTCDate() + i,
-      ));
-    }
-    dates.push(date);
-  }
-  return dates;
-}
 
 export function groupByMonth(dates: Date[]): Array<{ month: string; start: number; end: number }> {
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];

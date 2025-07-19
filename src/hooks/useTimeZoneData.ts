@@ -16,7 +16,6 @@ interface UseTimeZoneDataReturn {
   setSelectedUtcDate: (date: Date | null) => void;
   setAnchorDate: (date: Date) => void;
   updateLocations: (locations: Location[]) => void;
-  setHomeTimezone: (timezoneName: string) => void;
 }
 
 // Minimal normalization for United States
@@ -321,29 +320,6 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     setLocations(newLocations);
   }, []);
 
-  // Set the home timezone by moving the specified location to the front
-  const setHomeTimezone = useCallback((timezoneName: string) => {
-    setLocations((prev) => {
-      const idx = prev.findIndex((loc) => loc.timezone.name === timezoneName);
-      if (idx <= 0) return prev; // Already first or not found
-      const newLocations = [...prev];
-      const [homeLoc] = newLocations.splice(idx, 1);
-      newLocations.unshift(homeLoc);
-      return newLocations;
-    });
-  }, []);
-
-  // Update the setSelectedTime and setSelectedUtcDate handlers
-  const handleSetSelectedTime = useCallback((time: Date) => {
-    // Store the time directly without any conversion
-    setSelectedTime(time);
-  }, []);
-
-  const handleSetSelectedUtcDate = useCallback((date: Date | null) => {
-    // Store the UTC date directly without any conversion
-    setSelectedUtcDate(date);
-  }, []);
-
   return {
     locations,
     selectedTime,
@@ -352,10 +328,9 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     homeTimezone,
     addLocation,
     removeLocation,
-    setSelectedTime: handleSetSelectedTime,
-    setSelectedUtcDate: handleSetSelectedUtcDate,
+    setSelectedTime,
+    setSelectedUtcDate,
     setAnchorDate,
     updateLocations,
-    setHomeTimezone,
   };
 };

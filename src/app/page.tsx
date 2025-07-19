@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { Globe, Clock } from 'lucide-react';
 import { LocationSelector } from '@/components/LocationSelector';
 import type { Location } from '@/types';
@@ -37,7 +37,6 @@ export default function Home() {
     updateLocations,
   } = useTimeZoneData();
 
-  const [hasInitialized, setHasInitialized] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationVariant, setNotificationVariant] = useState<'success' | 'error'>('success');
@@ -52,7 +51,6 @@ export default function Home() {
   
   useEffect(() => {
     if (locations && locations.length > 0) {
-      setHasInitialized(true);
       // Mark as initialized after a short delay to allow initial setup to complete
       setTimeout(() => {
         setIsInitialized(true);
@@ -94,8 +92,6 @@ export default function Home() {
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3000);
   }, []);
-
-  const tableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!selectedUtcDate) return;
@@ -193,10 +189,6 @@ export default function Home() {
     [setSelectedUtcDate, setSelectedTime, setSelectedColumnIndex, setAnchorDate, locations, anchorDate],
   );
 
-  const memoizedHandleTimeSlotClick = useCallback(handleTimeSlotClick, [handleTimeSlotClick]);
-  const memoizedRemoveLocation = useCallback(removeLocation, [removeLocation]);
-  const memoizedAddLocation = useCallback(addLocation, [addLocation]);
-
   // Get the selected time cell from the home city row
   const selectedTimeCell = React.useMemo(() => {
     if (!locations || locations.length === 0) return null;
@@ -255,10 +247,10 @@ export default function Home() {
     });
   }, [locations, selectedTime, selectedUtcDate, anchorDate, homeTimezone, showToast]);
 
-  if (!hasInitialized && (!locations || locations.length === 0)) {
+  if (!isInitialized && (!locations || locations.length === 0)) {
     return <div style={{ color: 'gray', textAlign: 'center', marginTop: 40 }}>Loading...</div>;
   }
-  if (hasInitialized && (!locations || locations.length === 0)) {
+  if (isInitialized && (!locations || locations.length === 0)) {
     return (
       <div style={{ color: 'red', textAlign: 'center', marginTop: 40 }}>
         No locations loaded. Check useTimeZoneData hook.
@@ -303,7 +295,7 @@ export default function Home() {
           {/* Time Zone Table Layout */}
           <div className="container mx-auto px-2 xs:px-4 max-w-7xl">
             <div className="w-full bg-card border rounded-lg shadow-sm relative overflow-hidden">
-              <div ref={tableRef}>
+              
                 <DndContext
                   key={locations.map((l) => l.id).join(',')}
                   sensors={sensors}
@@ -336,7 +328,7 @@ export default function Home() {
                               aria-colindex={1}
                             >
                               <LocationSelector
-                                onAddLocation={memoizedAddLocation}
+                                onAddLocation={addLocation}
                                 existingLocations={locations.map((l) => l.timezone)}
                               />
                             </td>
@@ -355,8 +347,8 @@ export default function Home() {
                             <TimeZoneRow
                               key={location.id}
                               location={location}
-                              onTimeSlotClick={memoizedHandleTimeSlotClick}
-                              onRemove={memoizedRemoveLocation}
+                              onTimeSlotClick={handleTimeSlotClick}
+                              onRemove={removeLocation}
                               isHome={rowIdx === 0}
                               homeTimezone={homeTimezone}
                               anchorDate={anchorDate}
@@ -369,7 +361,6 @@ export default function Home() {
                     </div>
                   </SortableContext>
                 </DndContext>
-              </div>
             </div>
             {/* Empty State */}
             {locations.length === 0 && (
