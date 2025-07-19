@@ -20,6 +20,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useTimeZoneData } from '@/hooks/useTimeZoneData';
 import { safeClipboardWrite } from '@/services/errorHandler';
+import { useDarkMode } from '@/hooks/useDarkMode';
 
 export default function Home() {
   // All hooks must be called at the top level
@@ -36,6 +37,8 @@ export default function Home() {
     setAnchorDate,
     updateLocations,
   } = useTimeZoneData();
+  
+  const { isDarkMode } = useDarkMode();
 
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
