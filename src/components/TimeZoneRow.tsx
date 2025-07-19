@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Location } from '../types';
-import { getTimezoneAbbrForDate, formatCurrentTimeInZone } from '../utils/timeUtils';
+import { getTimezoneAbbrForDate, formatTime } from '../utils/timeUtils';
 import TimeSlotCell from './TimeSlotCell';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -123,7 +123,7 @@ const TimeZoneHeaderCell: React.FC<{
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
           <span className="text-slate-700 dark:text-slate-100 font-semibold shrink-0 text-[10px] xs:text-xs ml-1">
-            {formatCurrentTimeInZone(location.timezone.name)}
+            {formatTime(new Date(), location.timezone.name)}
           </span>
         </div>
       </div>

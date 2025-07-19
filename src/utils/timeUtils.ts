@@ -15,34 +15,8 @@ export const formatTime = (date: Date, timeZone: string): string => {
   return formatInTimeZone(date, timeZone, 'h:mm a');
 };
 
-/**
- * Gets the current time in a specific timezone
- * Note: Returns current UTC time as formatting will handle timezone conversion
- * @returns Current Date object (UTC)
- * @example
- * getCurrentTimeInZone() // Current Date object
- */
-export const getCurrentTimeInZone = (): Date => {
-  // Always return the current UTC time; formatting will handle the zone
-  return new Date();
-};
 
-/**
- * Formats the current time in a specific timezone
- * @param timeZone - IANA timezone identifier
- * @returns Current time formatted as 'h:mm a' in the specified timezone
- * @example
- * formatCurrentTimeInZone('Asia/Tokyo') // "11:45 PM"
- */
-export const formatCurrentTimeInZone = (timeZone: string): string => {
-  return formatInTimeZone(new Date(), timeZone, 'h:mm a');
-};
 
-// Converts a wall clock time in fromZone to the corresponding wall clock time in toZone
-export const convertTimeToZone = (date: Date, fromZone: string, toZone: string): Date => {
-  const utcDate = fromZonedTime(date, fromZone);
-  return toZonedTime(utcDate, toZone);
-};
 
 /**
  * Generates aligned time slots for timezone comparison
@@ -125,11 +99,14 @@ export function generateAlignedTimeSlots(
 export { getCurrentTimezoneAbbr, getTimezoneAbbrForDate };
 
 // Get current timezone offset in hours
-export const getCurrentTimezoneOffset = (timeZone: string): number => {
+export const getTimezoneOffset = (timezone: string): number => {
   const now = new Date();
-  const utc = toZonedTime(now, timeZone);
-  const local = toZonedTime(now, timeZone);
-  return (local.getTime() - utc.getTime()) / (1000 * 60 * 60);
+  const utcHour = now.getUTCHours();
+  const utcMinute = now.getUTCMinutes();
+  const localTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+  const hour = localTime.getHours();
+  const minute = localTime.getMinutes();
+  return hour - utcHour + (minute - utcMinute) / 60;
 };
 
 // Utility: getSlotBgColor

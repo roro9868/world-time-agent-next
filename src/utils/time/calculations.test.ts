@@ -1,24 +1,16 @@
 import {
-  getCurrentTimeInZone,
-  convertTimeToZone,
-  getCurrentTimezoneOffset,
+  getTimezoneOffset,
   getSlotBgColor,
 } from '../timeUtils';
 
 describe('calculations', () => {
-  it('gets current time in zone', () => {
-    const date = getCurrentTimeInZone();
+  it('gets current time as Date object', () => {
+    const date = new Date();
     expect(date).toBeInstanceOf(Date);
   });
 
-  it('converts time between zones', () => {
-    const date = new Date('2023-01-01T12:00:00Z');
-    const converted = convertTimeToZone(date, 'UTC', 'America/New_York');
-    expect(converted).toBeInstanceOf(Date);
-  });
-
   it('gets current timezone offset', () => {
-    const offset = getCurrentTimezoneOffset('UTC');
+    const offset = getTimezoneOffset('UTC');
     expect(typeof offset).toBe('number');
   });
 

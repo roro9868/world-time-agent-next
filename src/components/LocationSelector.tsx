@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { MapPin } from 'lucide-react';
 import cityTimezones from 'city-timezones';
 import type { TimeZone } from '../types';
+import { getTimezoneOffset } from '../utils/timeUtils';
 
 interface LocationSelectorProps {
   onAddLocation: (timezone: TimeZone) => void;
@@ -14,16 +15,6 @@ interface SearchTimeZone extends TimeZone {
   population?: number;
 }
 
-// Helper function to calculate timezone offset
-function getTimezoneOffset(timezone: string): number {
-  const now = new Date();
-  const utcHour = now.getUTCHours();
-  const utcMinute = now.getUTCMinutes();
-  const localTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-  const hour = localTime.getHours();
-  const minute = localTime.getMinutes();
-  return hour - utcHour + (minute - utcMinute) / 60;
-}
 
 // Helper function to get flag emoji from country code
 function countryCodeToFlagEmoji(countryCode: string): string {

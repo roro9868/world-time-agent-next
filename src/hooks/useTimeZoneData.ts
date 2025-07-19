@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import type { Location, TimeZone } from '../types';
-import { generateAlignedTimeSlots } from '../utils/timeUtils';
-import { getCurrentTimeInZone } from '../utils/timeUtils';
+import { generateAlignedTimeSlots, getTimezoneOffset } from '../utils/timeUtils';
 import cityTimezones from 'city-timezones';
 import { toZonedTime } from 'date-fns-tz';
 
@@ -86,16 +85,6 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
       }
     };
 
-    // Helper function to calculate timezone offset
-    const getTimezoneOffset = (timezone: string): number => {
-      const now = new Date();
-      const utcHour = now.getUTCHours();
-      const utcMinute = now.getUTCMinutes();
-      const localTime = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
-      const hour = localTime.getHours();
-      const minute = localTime.getMinutes();
-      return hour - utcHour + (minute - utcMinute) / 60;
-    };
 
     // Get default locations from city-timezones library
     const defaultLocations = defaultCityKeys
@@ -130,7 +119,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
         return {
           id: city.name + ':' + city.city,
           timezone: city,
-          currentTime: getCurrentTimeInZone(),
+          currentTime: new Date(),
           timeSlots: generateAlignedTimeSlots(
             baseTime,
             userTimezone,
@@ -237,7 +226,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     const initialLocation: Location = {
       id: 'local',
       timezone: localTimezone,
-      currentTime: getCurrentTimeInZone(),
+      currentTime: new Date(),
       timeSlots: generateAlignedTimeSlots(
         baseTime,
         userTimezone,
@@ -261,7 +250,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
       setLocations((prev) =>
         prev.map((location) => ({
           ...location,
-          currentTime: getCurrentTimeInZone(),
+          currentTime: new Date(),
         })),
       );
     }, 60 * 1000);
@@ -270,7 +259,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     setLocations((prev) =>
       prev.map((location) => ({
         ...location,
-        currentTime: getCurrentTimeInZone(),
+        currentTime: new Date(),
       })),
     );
 
@@ -294,7 +283,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
           {
             id: `${timezone.name}:${timezone.city}`,
             timezone,
-            currentTime: getCurrentTimeInZone(),
+            currentTime: new Date(),
             timeSlots: generateAlignedTimeSlots(
               selectedTime,
               homeTimezone,

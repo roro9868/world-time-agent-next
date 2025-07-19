@@ -1,11 +1,9 @@
 import {
   formatTime,
-  getCurrentTimeInZone,
-  convertTimeToZone,
   generateAlignedTimeSlots,
   getCurrentTimezoneAbbr,
   getTimezoneAbbrForDate,
-  getCurrentTimezoneOffset,
+  getTimezoneOffset,
   getSlotBgColor,
   generateDateRange,
   groupByMonth,
@@ -28,19 +26,13 @@ describe('timeUtils', () => {
     });
   });
 
-  describe('getCurrentTimeInZone', () => {
+  describe('new Date()', () => {
     it('returns current time', () => {
-      const result = getCurrentTimeInZone();
+      const result = new Date();
       expect(result).toBeInstanceOf(Date);
     });
   });
 
-  describe('convertTimeToZone', () => {
-    it('converts time between zones', () => {
-      const result = convertTimeToZone(mockDate, 'America/New_York', 'Europe/London');
-      expect(result).toBeInstanceOf(Date);
-    });
-  });
 
   describe('generateAlignedTimeSlots', () => {
     it('generates time slots correctly', () => {
@@ -74,9 +66,9 @@ describe('timeUtils', () => {
     });
   });
 
-  describe('getCurrentTimezoneOffset', () => {
+  describe('getTimezoneOffset', () => {
     it('returns timezone offset', () => {
-      const result = getCurrentTimezoneOffset('America/New_York');
+      const result = getTimezoneOffset('America/New_York');
       expect(typeof result).toBe('number');
     });
   });
