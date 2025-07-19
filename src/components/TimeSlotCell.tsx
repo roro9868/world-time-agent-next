@@ -15,19 +15,11 @@ interface TimeSlotCellProps {
 const getTimeSlotStyling = (
   slot: TimeSlot,
   isSelected: boolean,
-  isCurrent: boolean,
 ): { className: string; variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined } => {
   if (isSelected) {
     return {
       className: 'bg-slate-600 dark:bg-slate-700 text-white border-slate-500 dark:border-slate-600 ring-2 ring-slate-400/50 dark:ring-slate-300/50 hover:bg-slate-700 dark:hover:bg-slate-600 shadow-md',
       variant: 'default'
-    };
-  }
-  
-  if (isCurrent) {
-    return {
-      className: 'bg-teal-100 dark:bg-teal-900/40 text-teal-800 dark:text-teal-200 border-teal-300 dark:border-teal-600 ring-2 ring-teal-400/50 dark:ring-teal-300/50 hover:bg-teal-200 dark:hover:bg-teal-900/60',
-      variant: 'outline'
     };
   }
 
@@ -52,25 +44,17 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = React.memo(({
   /**
    * Date label logic:
    * - Show the date label if this is the first column in the row (colIdx === 0)
-   * - OR if the slot is at 12:00AM or 12:30AM in the local time of the row's city
-   *   (i.e., slot.hour === 0 && (slot.minute === 0 || slot.minute === 30))
+   * - OR if the slot is at 12:00AM in the local time of the row's city
+   *   (i.e., slot.hour === 0 && slot.minute === 0)
    *
    * This ensures:
    * - The first column always shows the date label for context
-   * - Every local midnight (or 12:30AM for half-hour timezones) also shows the date label
+   * - Every local midnight also shows the date label
    */
   const showDateLabel =
-    colIdx === 0 || (slot.hour === 0 && (slot.minute === 0 || slot.minute === 30));
+    colIdx === 0 || (slot.hour === 0 && slot.minute === 0);
 
-  // Debug: Log slot info for LA midnight slots
-  // if (timezone.name === 'America/Los_Angeles' && isNewDay) {
-  //   // eslint-disable-next-line no-console
-  //   console.log('[CELL DEBUG] LA slot', {
-  //     slotDate: slot.date,
-  //     formatted: formatInTimeZone(slot.date, timezone.name, 'MMM d'),
-  //     slot,
-  //   });
-  // }
+
 
   // Always format the slot's time using the UTC base and the target timezone
   const formattedTime = formatInTimeZone(slot.utc, timezone.name, 'h:mm a');
@@ -91,7 +75,7 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = React.memo(({
     }
   };
 
-  const styling = getTimeSlotStyling(slot, slot.isSelected, slot.isCurrent);
+  const styling = getTimeSlotStyling(slot, slot.isSelected);
   
   return (
     <td className="px-0 py-0 text-center align-middle relative min-w-[20px] xs:min-w-[24px] sm:min-w-[28px] lg:min-w-[32px]">
@@ -103,7 +87,9 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = React.memo(({
           </div>
         )}
         <Button
-          onClick={() => onTimeSlotClick(colIdx, slot.utc, slot.date, timezone.name)}
+          onClick={() => {
+            onTimeSlotClick(colIdx, slot.utc, slot.date, timezone.name);
+          }}
           onKeyDown={handleKeyDown}
           variant={styling.variant}
           size="sm"

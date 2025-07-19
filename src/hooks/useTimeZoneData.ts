@@ -68,9 +68,10 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     ];
 
     const baseTime = getHomeMidnightDate(new Date(), userTimezone);
-    const homeSlots = generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, baseTime);
+    
+    const homeSlots = generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, baseTime, undefined, 0);
     const initialUtc = homeSlots[0].utc;
-
+    
     // Helper function to get flag emoji from country code
     const countryCodeToFlagEmoji = (countryCode: string): string => {
       if (!countryCode || countryCode.length !== 2) return '🌍';
@@ -129,13 +130,14 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
         return {
           id: city.name + ':' + city.city,
           timezone: city,
-          currentTime: getCurrentTimeInZone(city.name),
+          currentTime: getCurrentTimeInZone(),
           timeSlots: generateAlignedTimeSlots(
             baseTime,
             userTimezone,
             city.name,
             baseTime,
             initialUtc,
+            0,
           ),
         };
       })
@@ -212,7 +214,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     // If not a priority city, default to New York
     if (!localCityInfo) {
       localCityInfo = Object.values(cityTimezones.cityMapping).find(
-        (info: any) => info.timezone === 'America/New_York' && info.city === 'New York',
+        (info: CityTimezoneInfo) => info.timezone === 'America/New_York' && info.city === 'New York',
       );
     }
 
@@ -235,13 +237,14 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     const initialLocation: Location = {
       id: 'local',
       timezone: localTimezone,
-      currentTime: getCurrentTimeInZone(userTimezone),
+      currentTime: getCurrentTimeInZone(),
       timeSlots: generateAlignedTimeSlots(
         baseTime,
         userTimezone,
         userTimezone,
         baseTime,
         initialUtc,
+        0,
       ),
     };
 
@@ -249,6 +252,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     setSelectedTime(baseTime);
     setAnchorDate(baseTime);
     setSelectedUtcDate(initialUtc);
+    // Note: selectedColumnIndex will be set to 0 by default in the page component
   }, [getHomeMidnightDate]);
 
   // Update currentTime for all locations every minute
@@ -257,7 +261,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
       setLocations((prev) =>
         prev.map((location) => ({
           ...location,
-          currentTime: getCurrentTimeInZone(location.timezone.name),
+          currentTime: getCurrentTimeInZone(),
         })),
       );
     }, 60 * 1000);
@@ -266,7 +270,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
     setLocations((prev) =>
       prev.map((location) => ({
         ...location,
-        currentTime: getCurrentTimeInZone(location.timezone.name),
+        currentTime: getCurrentTimeInZone(),
       })),
     );
 
@@ -290,13 +294,14 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
           {
             id: `${timezone.name}:${timezone.city}`,
             timezone,
-            currentTime: getCurrentTimeInZone(timezone.name),
+            currentTime: getCurrentTimeInZone(),
             timeSlots: generateAlignedTimeSlots(
               selectedTime,
               homeTimezone,
               timezone.name,
               selectedTime,
               currentUtcDate,
+              0,
             ),
           },
         ];

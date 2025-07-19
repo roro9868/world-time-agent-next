@@ -1,4 +1,4 @@
-import { isWeekend, isToday } from 'date-fns';
+import { isWeekend } from 'date-fns';
 import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 import type { TimeSlot } from '../types';
 import { getCurrentTimezoneAbbr, getTimezoneAbbrForDate } from './timezoneAbbr';
@@ -18,12 +18,11 @@ export const formatTime = (date: Date, timeZone: string): string => {
 /**
  * Gets the current time in a specific timezone
  * Note: Returns current UTC time as formatting will handle timezone conversion
- * @param timeZone - IANA timezone identifier
  * @returns Current Date object (UTC)
  * @example
- * getCurrentTimeInZone('Europe/London') // Current Date object
+ * getCurrentTimeInZone() // Current Date object
  */
-export const getCurrentTimeInZone = (timeZone: string): Date => {
+export const getCurrentTimeInZone = (): Date => {
   // Always return the current UTC time; formatting will handle the zone
   return new Date();
 };
@@ -47,8 +46,8 @@ export const convertTimeToZone = (date: Date, fromZone: string, toZone: string):
 
 /**
  * Generates aligned time slots for timezone comparison
- * Creates a 24-hour timeline (or 26-hour for half-hour timezones) starting from midnight
- * in the home timezone and showing corresponding times in the target timezone
+ * Creates a 26-hour timeline starting from midnight in the home timezone 
+ * and showing corresponding times in the target timezone
  * 
  * @param baseDate - The reference date in home timezone (local time)
  * @param homeTimezone - IANA timezone identifier for home location
@@ -72,37 +71,35 @@ export function generateAlignedTimeSlots(
   targetTimezone: string,
   selectedTime?: Date,
   selectedUtcDate?: Date,
+  selectedColumnIndex?: number,
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
+  
   // Start at midnight in the home timezone
   const homeMidnight = new Date(baseDate);
   homeMidnight.setHours(0, 0, 0, 0);
   const utcBase = fromZonedTime(homeMidnight, homeTimezone);
 
-  // Determine if this timezone has a 30-minute offset
-  const offsetMinutes = getCurrentTimezoneOffset(targetTimezone) * 60;
-  const hasHalfHour = Math.abs(offsetMinutes % 60) === 30;
-  // CHANGED: increments from 24 to 26 (whole hour), 48 to 52 (half hour)
-  const increments = hasHalfHour ? 52 : 26;
+  // Always generate 26 slots (24 hours + 2 extra hours for next day)
+  const increments = 26;
 
   for (let i = 0; i < increments; i++) {
-    const minutesToAdd = hasHalfHour ? i * 30 : i * 60;
+    const minutesToAdd = i * 60;
     // The UTC time for this slot (aligned to home city's midnight)
     const utcSlot = new Date(utcBase.getTime() + minutesToAdd * 60 * 1000);
     // Convert to the target city's local time
     const localDate = toZonedTime(utcSlot, targetTimezone);
-    const isCurrent =
-      isToday(localDate) &&
-      localDate.getHours() === new Date().getHours() &&
-      localDate.getMinutes() === new Date().getMinutes();
     const isWeekendDay = isWeekend(localDate);
-    const isSelected = selectedUtcDate ? utcSlot.getTime() === selectedUtcDate.getTime() : false;
+    // Use column index for selection instead of UTC time matching
+    const isSelected = selectedColumnIndex !== undefined ? i === selectedColumnIndex : false;
+    
+
     // Determine if this is the first slot of a new local day
     let isMidnight = false;
     if (i === 0) {
       isMidnight = true;
     } else {
-      const prevMinutesToAdd = hasHalfHour ? (i - 1) * 30 : (i - 1) * 60;
+      const prevMinutesToAdd = (i - 1) * 60;
       const prevUtcSlot = new Date(utcBase.getTime() + prevMinutesToAdd * 60 * 1000);
       const prevLocalDate = toZonedTime(prevUtcSlot, targetTimezone);
       isMidnight =
@@ -115,7 +112,7 @@ export function generateAlignedTimeSlots(
       time: formatTime(localDate, targetTimezone),
       date: localDate,
       utc: utcSlot,
-      isCurrent,
+      isCurrent: false, // Always false since we removed current time highlighting
       isSelected,
       isWeekend: isWeekendDay,
       isMidnight,
@@ -171,7 +168,7 @@ export function generateDateRange(startDate: Date, count: number, homeTimezone?:
 }
 
 export function groupByMonth(dates: Date[]): Array<{ month: string; start: number; end: number }> {
-  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const groups: Array<{ month: string; start: number; end: number }> = [];
   let currentMonthIdx = -1;
   let startIndex = 0;

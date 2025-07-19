@@ -165,7 +165,7 @@ export function getTimezoneAbbrForDate(date: Date, timezone: string): string {
     // Fallback: calculate and format GMT offset
     const offsetMinutes = getTimezoneOffset(date, timezone);
     return formatGMTOffset(offsetMinutes);
-  } catch (error) {
+  } catch {
     // Final fallback
     return 'GMT';
   }

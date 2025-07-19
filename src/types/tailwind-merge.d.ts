@@ -1,3 +1,3 @@
 declare module 'tailwind-merge' {
-  export function twMerge(...inputs: any[]): string;
+  export function twMerge(...inputs: (string | undefined | null | false)[]): string;
 }

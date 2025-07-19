@@ -106,12 +106,19 @@ export async function safeClipboardWrite(text: string): Promise<boolean> {
   }
 }
 
+interface LocationData {
+  timezone?: string;
+  city?: string;
+  country?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Validates and sanitizes location data
  * @param location - Location object to validate
  * @returns Validated location or null if invalid
  */
-export function validateLocation(location: any): any | null {
+export function validateLocation(location: LocationData): LocationData | null {
   try {
     if (!location || typeof location !== 'object') {
       return null;

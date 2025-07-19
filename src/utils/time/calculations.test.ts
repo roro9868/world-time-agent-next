@@ -7,7 +7,7 @@ import {
 
 describe('calculations', () => {
   it('gets current time in zone', () => {
-    const date = getCurrentTimeInZone('UTC');
+    const date = getCurrentTimeInZone();
     expect(date).toBeInstanceOf(Date);
   });
 

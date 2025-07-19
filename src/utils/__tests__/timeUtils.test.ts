@@ -30,7 +30,7 @@ describe('timeUtils', () => {
 
   describe('getCurrentTimeInZone', () => {
     it('returns current time', () => {
-      const result = getCurrentTimeInZone('America/New_York');
+      const result = getCurrentTimeInZone();
       expect(result).toBeInstanceOf(Date);
     });
   });

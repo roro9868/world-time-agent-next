@@ -73,6 +73,7 @@ const defaultProps = {
   homeTimezone: 'America/New_York',
   anchorDate: new Date('2024-01-01T00:00:00Z'),
   selectedUtcDate: new Date('2024-01-01T12:00:00Z'),
+  selectedColumnIndex: 0,
   totalLocations: 3,
 };
 

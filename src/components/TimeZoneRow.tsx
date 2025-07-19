@@ -17,6 +17,7 @@ interface TimeZoneRowProps {
   homeTimezone?: string;
   anchorDate: Date;
   selectedUtcDate: Date;
+  selectedColumnIndex: number;
   totalLocations: number;
 }
 
@@ -141,12 +142,13 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     homeTimezone,
     anchorDate,
     selectedUtcDate,
+    selectedColumnIndex,
     totalLocations,
   }) => {
     const { timezone } = location;
     const isHomeRow = homeTimezone && timezone.name === homeTimezone;
 
-    // Memoize timeSlots for this row only - add timezone offset to dependency array
+    // Memoize timeSlots for this row only
     const timeSlots = React.useMemo(() => {
       return generateAlignedTimeSlots(
         anchorDate,
@@ -154,8 +156,9 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         timezone.name,
         anchorDate,
         selectedUtcDate,
+        selectedColumnIndex,
       );
-    }, [anchorDate, homeTimezone, timezone.name, selectedUtcDate, timezone.offset]);
+    }, [anchorDate, homeTimezone, timezone.name, selectedUtcDate, selectedColumnIndex]);
 
     // Make the row draggable
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({

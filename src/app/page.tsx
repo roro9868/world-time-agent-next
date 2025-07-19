@@ -6,7 +6,7 @@ import type { Location } from '@/types';
 import { generateAlignedTimeSlots } from '@/utils/timeUtils';
 import { DateBar } from '@/components/DateBar';
 import TimeZoneRow from '@/components/TimeZoneRow';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import {
   DndContext,
   closestCenter,
@@ -41,10 +41,53 @@ export default function Home() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [notificationVariant, setNotificationVariant] = useState<'success' | 'error'>('success');
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [selectedColumnIndex, setSelectedColumnIndex] = useState<number>(() => {
+    // Calculate current time column index on initial state
+    const now = new Date();
+    const homeTime = toZonedTime(now, homeTimezone);
+    const currentHour = homeTime.getHours();
+    return Math.min(Math.max(currentHour, 0), 25);
+  });
   
   useEffect(() => {
-    if (locations && locations.length > 0) setHasInitialized(true);
-  }, [locations]);
+    if (locations && locations.length > 0) {
+      setHasInitialized(true);
+      // Mark as initialized after a short delay to allow initial setup to complete
+      setTimeout(() => {
+        setIsInitialized(true);
+      }, 100);
+    }
+  }, [locations, selectedColumnIndex, homeTimezone]);
+
+  // Update selectedColumnIndex when home city changes to ensure it's valid
+  useEffect(() => {
+    if (!locations || locations.length === 0 || !selectedUtcDate) return;
+    
+    const homeLocation = locations[0];
+    if (!homeLocation || !homeLocation.timeSlots) return;
+    
+    // Check if current selectedColumnIndex is valid for the new home city
+    const currentSlot = homeLocation.timeSlots[selectedColumnIndex];
+    if (!currentSlot) {
+      
+      // Find the time slot that matches the current selected time
+      const matchingSlotIndex = homeLocation.timeSlots.findIndex(slot => 
+        Math.abs(slot.utc.getTime() - selectedUtcDate.getTime()) < 60000 // Within 1 minute
+      );
+      
+      if (matchingSlotIndex !== -1) {
+        setSelectedColumnIndex(matchingSlotIndex);
+      } else {
+        // Fallback to current hour in home timezone
+        const homeTime = toZonedTime(selectedUtcDate, homeTimezone);
+        const currentHour = homeTime.getHours();
+        const fallbackIndex = Math.min(Math.max(currentHour, 0), 25);
+        setSelectedColumnIndex(fallbackIndex);
+      }
+    }
+  }, [locations, selectedUtcDate, homeTimezone, selectedColumnIndex]);
 
   const showToast = useCallback((message: string, variant: 'success' | 'error' = 'success') => {
     setNotificationMessage(message);
@@ -56,28 +99,40 @@ export default function Home() {
   const tableRef = useRef<HTMLDivElement>(null);
 
   const getHomeMidnightDate = useCallback((date: Date, homeTimezone: string) => {
+    // Convert the input date to the home timezone to get the correct date
     const zoned = toZonedTime(date, homeTimezone);
     const year = zoned.getFullYear();
     const month = zoned.getMonth();
     const day = zoned.getDate();
-    const utcMidnight = new Date(Date.UTC(year, month, day, 0, 0, 0));
-    const offsetMinutes = -toZonedTime(utcMidnight, homeTimezone).getTimezoneOffset();
-    return new Date(utcMidnight.getTime() - offsetMinutes * 60 * 1000);
+    
+    // Create midnight in the home timezone, then convert to UTC
+    const homeMidnightLocal = new Date(year, month, day, 0, 0, 0, 0);
+    const homeMidnightUtc = toZonedTime(homeMidnightLocal, homeTimezone);
+    
+    return homeMidnightUtc;
   }, []);
 
   useEffect(() => {
     if (!selectedUtcDate) return;
-    const trueAnchor = getHomeMidnightDate(anchorDate, homeTimezone);
+    
+    // anchorDate is already the correct UTC midnight from handleTimeSlotClick
+    const trueAnchor = anchorDate;
+    // Convert UTC anchor date to local date in home timezone for generateAlignedTimeSlots
+    // We need to convert the UTC date to a local date in the home timezone
+    const localAnchorDate = fromZonedTime(trueAnchor, homeTimezone);
+    
     const updatedLocations = locations.map((location) => ({
       ...location,
       timeSlots: generateAlignedTimeSlots(
-        trueAnchor,
+        localAnchorDate,
         homeTimezone,
         location.timezone.name,
         trueAnchor,
         selectedUtcDate,
+        selectedColumnIndex,
       ),
     }));
+    
     const isSame =
       locations.length === updatedLocations.length &&
       locations.every((loc, idx) => {
@@ -88,10 +143,13 @@ export default function Home() {
         }
         return true;
       });
+    
+
+    
     if (!isSame) {
       updateLocations(updatedLocations);
     }
-  }, [selectedUtcDate, anchorDate, homeTimezone, locations, updateLocations, getHomeMidnightDate]);
+  }, [selectedUtcDate, anchorDate, homeTimezone, locations, updateLocations, hasUserInteracted, isInitialized, selectedColumnIndex]);
 
   const normalizeLocationIds = useCallback((locations: Location[]): Location[] => {
     return locations.map((loc, idx) => ({
@@ -122,20 +180,82 @@ export default function Home() {
   );
 
   const handleTimeSlotClick = useCallback(
-    (_colIdx: number, slotUtc: Date, _slotLocal: Date, _slotTimezone: string) => {
-      setSelectedUtcDate(slotUtc);
-      setSelectedTime(slotUtc);
-      const dateStr = formatInTimeZone(slotUtc, homeTimezone, 'yyyy-MM-dd');
-      const homeMidnight = new Date(`${dateStr}T00:00:00`);
-      setAnchorDate(homeMidnight);
+    (colIdx: number, utc: Date, localDate: Date, timezoneName: string) => {
+      // If clicking on a time slot in the next day (index 24 or higher), we need to regenerate
+      if (colIdx >= 24) {
+        // Calculate the new anchor date for the next day
+        const nextDayAnchor = new Date(anchorDate);
+        nextDayAnchor.setDate(nextDayAnchor.getDate() + 1);
+        
+        setAnchorDate(nextDayAnchor);
+        setSelectedUtcDate(utc);
+        setSelectedTime(localDate);
+        setSelectedColumnIndex(colIdx - 24); // Adjust index for new day
+      } else {
+        setSelectedUtcDate(utc);
+        setSelectedTime(localDate);
+        setSelectedColumnIndex(colIdx);
+      }
     },
-    [setSelectedTime, setSelectedUtcDate, setAnchorDate, homeTimezone],
+    [anchorDate, setSelectedUtcDate, setSelectedTime, setSelectedColumnIndex, setAnchorDate],
   );
+
+  const memoizedHandleTimeSlotClick = useCallback(handleTimeSlotClick, [handleTimeSlotClick]);
+  const memoizedRemoveLocation = useCallback(removeLocation, [removeLocation]);
+  const memoizedAddLocation = useCallback(addLocation, [addLocation]);
+
+  // Get the selected time cell from the home city row
+  const selectedTimeCell = React.useMemo(() => {
+    if (!locations || locations.length === 0) return null;
+    
+    const homeLocation = locations[0]; // First location is always the home location
+    if (!homeLocation || !homeLocation.timeSlots) return null;
+    
+    // Find the time slot at the selected column index
+    let selectedSlot = homeLocation.timeSlots[selectedColumnIndex];
+    
+    if (selectedSlot) {
+    } else {
+    }
+    
+    // If the selected column index is invalid for the new home city, 
+    // find the time slot that matches the current selected time
+    if (!selectedSlot && selectedUtcDate) {
+      
+      const matchingSlot = homeLocation.timeSlots.find(slot => 
+        Math.abs(slot.utc.getTime() - selectedUtcDate.getTime()) < 60000 // Within 1 minute
+      );
+      
+      if (matchingSlot) {
+        selectedSlot = matchingSlot;
+      } else {
+        selectedSlot = homeLocation.timeSlots[0];
+      }
+    }
+    
+    const finalSlot = selectedSlot || homeLocation.timeSlots[0] || null;
+    
+    return finalSlot;
+  }, [locations, selectedColumnIndex, selectedUtcDate, selectedTime]);
 
   const handleDateChange = useCallback(
     (date: Date) => {
       const newAnchorDate = getHomeMidnightDate(date, homeTimezone);
-      if (selectedUtcDate) {
+      
+      // Optimized: Use selectedTimeCell if available to preserve the selected time
+      if (selectedTimeCell) {
+        // Use the selected time cell's hour and minute directly
+        const selectedHour = selectedTimeCell.hour;
+        const selectedMinute = selectedTimeCell.minute;
+        
+        // Create new time by combining the new date with the selected time
+        const newHomeTime = new Date(newAnchorDate);
+        newHomeTime.setHours(selectedHour, selectedMinute, 0, 0);
+        
+        setSelectedUtcDate(newHomeTime);
+        setSelectedTime(newHomeTime);
+      } else if (selectedUtcDate) {
+        // Fallback: use timezone conversion if no selectedTimeCell
         const selectedHomeTime = toZonedTime(selectedUtcDate, homeTimezone);
         const selectedHour = selectedHomeTime.getHours();
         const selectedMinute = selectedHomeTime.getMinutes();
@@ -147,6 +267,7 @@ export default function Home() {
       setAnchorDate(newAnchorDate);
     },
     [
+      selectedTimeCell,
       selectedUtcDate,
       homeTimezone,
       getHomeMidnightDate,
@@ -155,10 +276,6 @@ export default function Home() {
       setAnchorDate,
     ],
   );
-
-  const memoizedHandleTimeSlotClick = useCallback(handleTimeSlotClick, [handleTimeSlotClick]);
-  const memoizedRemoveLocation = useCallback(removeLocation, [removeLocation]);
-  const memoizedAddLocation = useCallback(addLocation, [addLocation]);
 
   const handleShareLink = useCallback(() => {
     const url = new URL(window.location.origin + window.location.pathname);
@@ -272,6 +389,9 @@ export default function Home() {
                                   onDateChange={handleDateChange}
                                   homeTimezone={homeTimezone}
                                   onShareLink={handleShareLink}
+                                  selectedTimeCell={selectedTimeCell}
+                                  homeTimeSlots={locations[0]?.timeSlots}
+                                  anchorDate={anchorDate}
                                 />
                               </div>
                             </td>
@@ -286,6 +406,7 @@ export default function Home() {
                               homeTimezone={homeTimezone}
                               anchorDate={anchorDate}
                               selectedUtcDate={selectedUtcDate || anchorDate}
+                              selectedColumnIndex={selectedColumnIndex}
                               totalLocations={locations.length}
                             />
                           ))}
