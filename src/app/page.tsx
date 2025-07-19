@@ -281,11 +281,11 @@ export default function Home() {
         )}
         <div className="w-full">
           {/* Header */}
-          <div className="w-full bg-slate-800 text-white shadow-lg mb-6">
+          <div className="w-full bg-slate-800 dark:bg-slate-900 text-white shadow-lg mb-6 border-b border-slate-700 dark:border-slate-600">
             <div className="container mx-auto px-4 py-3 flex items-center justify-center max-w-7xl">
               <div className="flex items-center gap-3">
                 <div className="relative flex items-center justify-center">
-                  <Globe className="h-6 w-6 text-teal-400" />
+                  <Globe className="h-6 w-6 text-teal-400 dark:text-teal-300" />
                 </div>
                 <h1 className="text-xl font-bold text-white">World Time Agent</h1>
               </div>
@@ -294,7 +294,7 @@ export default function Home() {
           
           {/* Time Zone Table Layout */}
           <div className="container mx-auto px-2 xs:px-4 max-w-7xl">
-            <div className="w-full bg-card border rounded-lg shadow-sm relative overflow-hidden">
+            <div className="w-full bg-card border border-border dark:border-slate-600 rounded-lg shadow-sm relative overflow-hidden">
               
                 <DndContext
                   key={locations.map((l) => l.id).join(',')}
@@ -308,32 +308,41 @@ export default function Home() {
                   >
                     <div className="overflow-x-auto w-full touch-pan-x">
                       <table 
-                        className="w-full border-separate border-spacing-0 min-w-[700px] sm:min-w-[800px] lg:min-w-[1000px]"
+                        className="border-separate border-spacing-0 min-w-[500px] sm:min-w-[600px] lg:min-w-[800px]"
                         role="grid"
                         aria-label="Time zone comparison table"
                         aria-rowcount={locations.length + 1}
                         aria-colcount={27}
+                        style={{
+                          width: 'max-content',
+                          tableLayout: 'auto'
+                        }}
                       >
                         <tbody>
                           {/* DateBar Header Row */}
                           <tr 
-                            className="border-b border-border bg-card"
+                            className="border-b border-border dark:border-slate-600 bg-card"
                             role="row"
                             aria-rowindex={1}
                             aria-label="Date and location selector row"
                           >
                             <td 
-                              className="sticky left-0 z-10 bg-card px-1 xs:px-2 py-2 border-r border-border min-w-[75px] xs:min-w-[80px] sm:min-w-[85px]"
+                              className="sticky left-0 z-30 bg-card px-1 xs:px-2 py-2 border-r border-border dark:border-slate-600"
                               role="gridcell"
                               aria-colindex={1}
+                              style={{
+                                width: 'max-content',
+                                maxWidth: '200px',
+                                minWidth: '120px'
+                              }}
                             >
                               <LocationSelector
                                 onAddLocation={addLocation}
                                 existingLocations={locations.map((l) => l.timezone)}
                               />
                             </td>
-                            <td className="px-0 py-2" colSpan={26}>
-                              <div className="flex justify-center">
+                            <td className="px-0 py-2 overflow-hidden" colSpan={26}>
+                              <div className="flex justify-center overflow-hidden">
                                 <DateBar
                                   selectedDate={selectedTime}
                                   onDateChange={handleDateChange}

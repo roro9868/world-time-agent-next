@@ -32,9 +32,14 @@ const TimeZoneHeaderCell: React.FC<{
 }> = React.memo(({ location, isHome, onRemove, dragHandleProps, totalLocations }) => {
   return (
   <td
-    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border min-w-[75px] xs:min-w-[80px] sm:min-w-[85px] transition-colors group-hover:bg-muted ${
-      isHome ? 'bg-blue-50 dark:bg-blue-900/40 border-l-2 border-l-blue-500 dark:border-l-blue-400' : 'bg-card'
+    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border transition-colors group-hover:bg-muted ${
+      isHome ? 'bg-blue-100 dark:bg-blue-900/60 border-l-2 border-l-blue-500 dark:border-l-blue-400' : 'bg-card'
     } overflow-hidden`}
+    style={{
+      width: 'max-content',
+      maxWidth: '200px',
+      minWidth: '120px'
+    }}
   >
     <div className="flex items-start gap-0.5 xs:gap-1">
       {/* Left column: Drag Handle and Remove Button */}
@@ -97,10 +102,10 @@ const TimeZoneHeaderCell: React.FC<{
       </div>
       
       {/* Right column: City info */}
-      <div className="flex flex-col min-w-0 flex-1 relative">
+      <div className="flex flex-col min-w-0 relative">
         {/* First row: city + flag + home icon */}
         <div className="flex items-center min-w-0 gap-1 h-5 xs:h-6">
-          <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
+          <span className="text-xs xs:text-sm font-semibold text-foreground">
             {location.timezone.city}
           </span>
           <span
@@ -111,17 +116,17 @@ const TimeZoneHeaderCell: React.FC<{
             {location.timezone.flag}
           </span>
           {isHome && (
-            <span className="ml-1 flex items-center">
+            <span className="ml-1 flex items-center shrink-0">
               <HomeIcon className="w-4 h-4 text-yellow-500" strokeWidth={2.2} />
             </span>
           )}
         </div>
         {/* Second row: abbr + current time */}
         <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1 h-5 xs:h-6">
-          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0">
+          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary dark:bg-slate-700 text-secondary-foreground dark:text-slate-200 text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0 border border-border dark:border-slate-600">
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          <span className="text-slate-700 dark:text-slate-100 font-semibold shrink-0 text-[10px] xs:text-xs ml-1">
+          <span className="text-slate-700 dark:text-slate-200 font-semibold text-[10px] xs:text-xs ml-1">
             {formatTime(new Date(), location.timezone.name)}
           </span>
         </div>
@@ -171,7 +176,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         ref={setNodeRef}
         style={style}
         className={`group hover:bg-muted/30 transition-colors border-b border-border ${
-          isHomeRow ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
+          isHomeRow ? 'bg-blue-100/50 dark:bg-blue-900/30 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
         } ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
         aria-label={`Time zone row for ${location.timezone.city}`}
         {...attributes}

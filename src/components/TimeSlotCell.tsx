@@ -18,16 +18,16 @@ const getTimeSlotStyling = (
 ): { className: string; variant: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" | null | undefined } => {
   if (isSelected) {
     return {
-      className: 'bg-slate-600 dark:bg-slate-700 text-white border-slate-500 dark:border-slate-600 ring-2 ring-slate-400/50 dark:ring-slate-300/50 hover:bg-slate-700 dark:hover:bg-slate-600 shadow-md',
+      className: 'bg-slate-600 dark:bg-blue-500 text-white border-slate-500 dark:border-blue-400 ring-2 ring-slate-400/50 dark:ring-blue-300/50 hover:bg-slate-700 dark:hover:bg-blue-600 shadow-md',
       variant: 'default'
     };
   }
 
-  // Day/night background colors with better visual hierarchy
+  // Day/night background colors with much better dark mode contrast
   const isDaytime = slot.hour >= 7 && slot.hour < 19;
   const bgClass = isDaytime 
-    ? 'bg-amber-50/60 hover:bg-amber-100/80 border-amber-100/40 dark:bg-amber-900/30 dark:hover:bg-amber-800/40 dark:border-amber-700/40' 
-    : 'bg-blue-50/60 hover:bg-blue-100/80 border-blue-100/40 dark:bg-blue-900/30 dark:hover:bg-blue-800/40 dark:border-blue-700/40';
+    ? 'bg-amber-100/80 hover:bg-amber-200/90 border-amber-200/60 dark:bg-amber-800/50 dark:hover:bg-amber-700/60 dark:border-amber-600/50 dark:text-amber-100' 
+    : 'bg-blue-100/80 hover:bg-blue-200/90 border-blue-200/60 dark:bg-blue-800/50 dark:hover:bg-blue-700/60 dark:border-blue-600/50 dark:text-blue-100';
   
   return {
     className: `${bgClass} hover:bg-accent hover:text-accent-foreground`,
@@ -78,11 +78,11 @@ const TimeSlotCell: React.FC<TimeSlotCellProps> = React.memo(({
   const styling = getTimeSlotStyling(slot, slot.isSelected);
   
   return (
-    <td className="px-0 py-0 text-center align-middle relative min-w-[20px] xs:min-w-[24px] sm:min-w-[28px] lg:min-w-[32px]">
+    <td className="px-0 py-0 text-center align-middle relative w-8 lg:w-10">
       <div className="relative w-full h-full flex flex-col items-center justify-center">
         {/* Show date label for first column, or at every local midnight/12:30AM, overlapping the top of the button */}
         {showDateLabel && (
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-foreground bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border shadow-sm">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8px] sm:text-[9px] lg:text-[10px] font-semibold text-foreground bg-card dark:bg-slate-800 px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border dark:border-slate-600 shadow-sm">
             {formatInTimeZone(slot.utc, timezone.name, 'MMM d')}
           </div>
         )}

@@ -215,7 +215,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, [debouncedSearchTerm, matches.length]);
 
   return (
-    <div className="flex items-center gap-1 w-full rounded px-1 py-1">
+    <div className="flex items-center gap-1 rounded px-1 py-1 max-w-full">
       <div className="shrink-0 h-4 w-4 flex items-center justify-center">
         <MapPin className="h-3 w-3 text-muted-foreground" />
       </div>
@@ -226,7 +226,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           aria-controls="location-selector-dropdown"
           aria-expanded={isFocused}
           aria-label="Search for a city to add"
-          className="flex-1 bg-background border border-border dark:border-gray-600 rounded px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring min-w-0 transition-colors"
+          className="flex-1 bg-background border border-border dark:border-slate-600 rounded px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring min-w-0 transition-colors"
           placeholder="Add city..."
           role="combobox"
           type="text"
@@ -242,7 +242,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         ReactDOM.createPortal(
           <div
             id="location-selector-dropdown"
-            className="fixed z-50 bg-popover border border-border rounded-md shadow-md max-h-60 overflow-y-auto"
+            className="fixed z-50 bg-popover dark:bg-slate-800 border border-border dark:border-slate-600 rounded-md shadow-md max-h-60 overflow-y-auto"
             style={{
               left: dropdownPos.left,
               top: dropdownPos.top,

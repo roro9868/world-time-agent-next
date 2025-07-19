@@ -86,7 +86,7 @@ export const DateBar: React.FC<DateBarProps> = ({
     <div className="flex items-center justify-between w-full gap-4">
       {/* Month groups with date cells */}
       <div className="flex-1 min-w-0 overflow-x-auto">
-        <div className="flex gap-1 w-fit items-center min-w-[450px] xs:min-w-[500px] sm:min-w-[550px]">
+        <div className="flex gap-1 w-fit items-center min-w-[450px] xs:min-w-[500px] sm:min-w-[550px] relative">
           {/* Calendar icon cell as a clickable button */}
           <CustomDatePicker
             value={pickerDate}
@@ -150,7 +150,7 @@ export const DateBar: React.FC<DateBarProps> = ({
                     return (
                       <div key={group.start + idx} className="relative">
                         {shouldShowMonthLabel && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-foreground bg-background px-1 rounded pointer-events-none select-none whitespace-nowrap z-10 border border-border shadow-sm">
+                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-foreground bg-card dark:bg-slate-800 px-1 rounded pointer-events-none select-none whitespace-nowrap z-20 border border-border dark:border-slate-600 shadow-sm">
                             {group.month}
                           </div>
                         )}
