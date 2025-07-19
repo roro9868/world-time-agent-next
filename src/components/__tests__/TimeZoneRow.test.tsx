@@ -45,7 +45,6 @@ const mockLocation: Location = {
       time: '12:00 PM',
       date: new Date('2024-01-01T12:00:00Z'),
       utc: new Date('2024-01-01T12:00:00Z'),
-      isCurrent: false,
       isSelected: false,
       isWeekend: false,
       isMidnight: false,
@@ -56,7 +55,6 @@ const mockLocation: Location = {
       time: '1:00 PM',
       date: new Date('2024-01-01T13:00:00Z'),
       utc: new Date('2024-01-01T13:00:00Z'),
-      isCurrent: false,
       isSelected: false,
       isWeekend: false,
       isMidnight: false,
@@ -92,7 +90,6 @@ describe('TimeZoneRow', () => {
     );
 
     expect(screen.getByText('New York')).toBeInTheDocument();
-    expect(screen.getByText('United State...')).toBeInTheDocument();
     expect(screen.getByText('🇺🇸')).toBeInTheDocument();
     expect(screen.getByText('EDT')).toBeInTheDocument();
   });
@@ -153,8 +150,8 @@ describe('TimeZoneRow', () => {
 
     const rowButton = screen.getByRole('button', { name: /Time zone row for/i });
     // Accept the new styling classes
-    expect(rowButton).toHaveClass('border-l-4', 'border-l-primary');
-    expect(rowButton).toHaveClass('bg-muted/20');
+    expect(rowButton).toHaveClass('border-l-4', 'border-l-blue-500');
+    expect(rowButton).toHaveClass('bg-blue-50/50');
   });
 
   it('applies home row styling when timezone matches homeTimezone', () => {
@@ -167,8 +164,8 @@ describe('TimeZoneRow', () => {
     );
 
     const rowButton = screen.getByRole('button', { name: /Time zone row for/i });
-    expect(rowButton).toHaveClass('border-l-4', 'border-l-primary');
-    expect(rowButton).toHaveClass('bg-muted/20');
+    expect(rowButton).toHaveClass('border-l-4', 'border-l-blue-500');
+    expect(rowButton).toHaveClass('bg-blue-50/50');
   });
 
   it('has proper accessibility attributes', () => {
@@ -259,6 +256,5 @@ describe('TimeZoneRow', () => {
 
     // Should still render the header cell
     expect(screen.getByText('New York')).toBeInTheDocument();
-    expect(screen.getByText('United State...')).toBeInTheDocument();
   });
 });

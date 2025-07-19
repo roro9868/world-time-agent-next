@@ -4,8 +4,6 @@ import {
   getCurrentTimezoneAbbr,
   getTimezoneAbbrForDate,
   getTimezoneOffset,
-  getSlotBgColor,
-  generateDateRange,
   groupByMonth,
   formatDateForDisplay,
 } from '../timeUtils';
@@ -33,7 +31,6 @@ describe('timeUtils', () => {
     });
   });
 
-
   describe('generateAlignedTimeSlots', () => {
     it('generates time slots correctly', () => {
       const baseDate = new Date('2023-01-15');
@@ -46,9 +43,9 @@ describe('timeUtils', () => {
       expect(slots[0]).toHaveProperty('time');
       expect(slots[0]).toHaveProperty('date');
       expect(slots[0]).toHaveProperty('utc');
-      expect(slots[0]).toHaveProperty('isCurrent');
       expect(slots[0]).toHaveProperty('isSelected');
       expect(slots[0]).toHaveProperty('isWeekend');
+      expect(slots[0]).toHaveProperty('isMidnight');
     });
   });
 
@@ -70,35 +67,6 @@ describe('timeUtils', () => {
     it('returns timezone offset', () => {
       const result = getTimezoneOffset('America/New_York');
       expect(typeof result).toBe('number');
-    });
-  });
-
-  describe('getSlotBgColor', () => {
-    it('returns correct background color for daytime', () => {
-      expect(getSlotBgColor(12, 0)).toBe('bg-amber-50'); // Noon
-      expect(getSlotBgColor(8, 0)).toBe('bg-amber-50'); // 8 AM
-      expect(getSlotBgColor(18, 0)).toBe('bg-amber-50'); // 6 PM
-    });
-
-    it('returns correct background color for nighttime', () => {
-      expect(getSlotBgColor(0, 0)).toBe('bg-blue-50'); // Midnight
-      expect(getSlotBgColor(6, 0)).toBe('bg-blue-50'); // 6 AM
-      expect(getSlotBgColor(22, 0)).toBe('bg-blue-50'); // 10 PM
-    });
-  });
-
-  describe('generateDateRange', () => {
-    it('generates correct date range', () => {
-      const startDate = new Date(Date.UTC(2023, 0, 1));
-      const dates = generateDateRange(startDate, 5);
-
-      expect(dates).toHaveLength(5);
-      expect(dates[0].getUTCFullYear()).toBe(2023);
-      expect(dates[0].getUTCMonth()).toBe(0);
-      expect(dates[0].getUTCDate()).toBe(1);
-      expect(dates[4].getUTCFullYear()).toBe(2023);
-      expect(dates[4].getUTCMonth()).toBe(0);
-      expect(dates[4].getUTCDate()).toBe(5);
     });
   });
 

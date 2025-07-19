@@ -2,35 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DateBar } from '../DateBar';
-import type { TimeSlot } from '../../types';
-
-// Create mock time slots for testing
-const createMockTimeSlots = (anchorDate: Date): TimeSlot[] => {
-  const slots: TimeSlot[] = [];
-  for (let i = 0; i < 26; i++) {
-    const slotDate = new Date(anchorDate);
-    slotDate.setHours(i, 0, 0, 0);
-    
-    slots.push({
-      hour: i,
-      minute: 0,
-      time: `${i === 0 ? 12 : i > 12 ? i - 12 : i}:00 ${i >= 12 ? 'PM' : 'AM'}`,
-      date: slotDate,
-      utc: new Date(slotDate.getTime() - 5 * 60 * 60 * 1000), // UTC offset for EST
-      isCurrent: false,
-      isSelected: false,
-      isWeekend: false,
-      isMidnight: i === 0,
-    });
-  }
-  return slots;
-};
 
 const defaultProps = {
   selectedDate: new Date('2024-01-15T12:00:00Z'),
   onDateChange: jest.fn(),
-  homeTimezone: 'America/New_York',
-  homeTimeSlots: createMockTimeSlots(new Date('2024-01-15T00:00:00Z')),
   anchorDate: new Date('2024-01-15T00:00:00Z'),
 };
 
@@ -143,12 +118,11 @@ describe('DateBar', () => {
 
   it('shows correct date format for different dates', () => {
     const differentDate = new Date('2024-12-25T12:00:00Z');
-    const differentTimeSlots = createMockTimeSlots(new Date('2024-12-25T00:00:00Z'));
     const differentAnchorDate = new Date('2024-12-25T00:00:00Z');
     render(
       <table>
         <tbody>
-          <DateBar {...defaultProps} selectedDate={differentDate} homeTimeSlots={differentTimeSlots} anchorDate={differentAnchorDate} />
+          <DateBar {...defaultProps} selectedDate={differentDate} anchorDate={differentAnchorDate} />
         </tbody>
       </table>,
     );
@@ -159,12 +133,11 @@ describe('DateBar', () => {
 
   it('handles leap year dates', () => {
     const leapYearDate = new Date('2024-02-29T12:00:00Z');
-    const leapYearTimeSlots = createMockTimeSlots(new Date('2024-02-29T00:00:00Z'));
     const leapYearAnchorDate = new Date('2024-02-29T00:00:00Z');
     render(
       <table>
         <tbody>
-          <DateBar {...defaultProps} selectedDate={leapYearDate} homeTimeSlots={leapYearTimeSlots} anchorDate={leapYearAnchorDate} />
+          <DateBar {...defaultProps} selectedDate={leapYearDate} anchorDate={leapYearAnchorDate} />
         </tbody>
       </table>,
     );
@@ -175,12 +148,11 @@ describe('DateBar', () => {
 
   it('handles year boundary dates', () => {
     const yearEndDate = new Date('2024-12-31T12:00:00Z');
-    const yearEndTimeSlots = createMockTimeSlots(new Date('2024-12-31T00:00:00Z'));
     const yearEndAnchorDate = new Date('2024-12-31T00:00:00Z');
     render(
       <table>
         <tbody>
-          <DateBar {...defaultProps} selectedDate={yearEndDate} homeTimeSlots={yearEndTimeSlots} anchorDate={yearEndAnchorDate} />
+          <DateBar {...defaultProps} selectedDate={yearEndDate} anchorDate={yearEndAnchorDate} />
         </tbody>
       </table>,
     );
@@ -191,12 +163,11 @@ describe('DateBar', () => {
 
   it('handles year start dates', () => {
     const yearStartDate = new Date('2024-01-01T12:00:00Z');
-    const yearStartTimeSlots = createMockTimeSlots(new Date('2024-01-01T00:00:00Z'));
     const yearStartAnchorDate = new Date('2024-01-01T00:00:00Z');
     render(
       <table>
         <tbody>
-          <DateBar {...defaultProps} selectedDate={yearStartDate} homeTimeSlots={yearStartTimeSlots} anchorDate={yearStartAnchorDate} />
+          <DateBar {...defaultProps} selectedDate={yearStartDate} anchorDate={yearStartAnchorDate} />
         </tbody>
       </table>,
     );

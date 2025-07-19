@@ -1,17 +1,15 @@
-import { generateDateRange, groupByMonth, formatDateForDisplay } from '../timeUtils';
+import { groupByMonth, formatDateForDisplay } from '../timeUtils';
 
 describe('ranges', () => {
-  it('generates a date range', () => {
-    const start = new Date('2023-01-01T00:00:00Z');
-    const range = generateDateRange(start, 5);
-    expect(range.length).toBe(5);
-    expect(range[0]).toBeInstanceOf(Date);
-  });
-
   it('groups dates by month', () => {
-    const start = new Date('2023-01-01T00:00:00Z');
-    const range = generateDateRange(start, 40);
-    const groups = groupByMonth(range);
+    const dates = [
+      new Date('2023-01-01T00:00:00Z'),
+      new Date('2023-01-15T00:00:00Z'),
+      new Date('2023-02-01T00:00:00Z'),
+      new Date('2023-02-15T00:00:00Z'),
+      new Date('2023-03-01T00:00:00Z'),
+    ];
+    const groups = groupByMonth(dates);
     expect(groups.length).toBeGreaterThan(0);
     expect(groups[0]).toHaveProperty('month');
     expect(groups[0]).toHaveProperty('start');

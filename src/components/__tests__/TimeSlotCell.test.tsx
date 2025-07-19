@@ -19,7 +19,6 @@ const mockTimeSlot: TimeSlot = {
   time: '7:00 AM',
   date: new Date('2024-01-01T07:00:00Z'),
   utc: new Date('2024-01-01T07:00:00Z'),
-  isCurrent: false,
   isSelected: false,
   isWeekend: false,
   isMidnight: false,
@@ -103,18 +102,6 @@ describe('TimeSlotCell', () => {
     // The first column should always show the date label
     const expectedDate = formatInTimeZone(mockTimeSlot.utc, mockTimezone.name, 'MMM d');
     expect(screen.getByText(expectedDate)).toBeInTheDocument();
-  });
-
-  it('applies current time styling when slot is current', () => {
-    const currentSlot = {
-      ...mockTimeSlot,
-      isCurrent: true,
-    };
-
-    render(<TimeSlotCell {...defaultProps} slot={currentSlot} />);
-
-    const button = screen.getByRole('button');
-    expect(button).toHaveClass('ring-2', 'ring-teal-400/50');
   });
 
   it('applies selected time styling when slot is selected', () => {
