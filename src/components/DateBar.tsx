@@ -125,8 +125,12 @@ export const DateBar: React.FC<DateBarProps> = ({
                 {/* Date cells for this month */}
                 <div className="flex gap-1 mt-5">
                   {groupDays.map((day, idx) => {
-                    // Highlight the center date (middle of 9-day range)
-                    const isSelected = idx === 4 && group.start + idx === 4; // Middle date in the 9-day range
+                    // Check if this day matches the selected date
+                    const isSelected = selectedDate && 
+                      day.getDate() === selectedDate.getDate() &&
+                      day.getMonth() === selectedDate.getMonth() &&
+                      day.getFullYear() === selectedDate.getFullYear();
+                    
                     const isWeekendDay = isWeekend(day);
                     const { day: dayNumber, weekday } = formatDateForDisplay(day);
 
