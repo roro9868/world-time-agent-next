@@ -86,7 +86,7 @@ export const DateBar: React.FC<DateBarProps> = ({
     <div className="flex items-center justify-between w-full gap-4">
       {/* Month groups with date cells */}
       <div className="flex-1 min-w-0 overflow-x-auto">
-        <div className="flex gap-1 w-fit items-center min-w-[450px] xs:min-w-[500px] sm:min-w-[550px] relative">
+        <div className="flex gap-0.5 xs:gap-1 w-fit items-center min-w-[300px] xs:min-w-[400px] sm:min-w-[500px] relative">
           {/* Calendar icon cell as a clickable button */}
           <CustomDatePicker
             value={pickerDate}
@@ -98,10 +98,10 @@ export const DateBar: React.FC<DateBarProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex flex-col items-center justify-center h-12 w-10 p-1 mt-3.5 text-center text-muted-foreground hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                className="flex flex-col items-center justify-center h-8 xs:h-10 sm:h-12 w-6 xs:w-8 sm:w-10 p-0.5 xs:p-1 mt-2 xs:mt-3 sm:mt-3.5 text-center text-muted-foreground hover-accent cursor-pointer"
                 aria-label="Open calendar"
               >
-                <Calendar className="h-6 w-6" />
+                <Calendar className="h-3 xs:h-4 sm:h-6 w-3 xs:w-4 sm:w-6" />
               </Button>
             }
           />
@@ -114,7 +114,7 @@ export const DateBar: React.FC<DateBarProps> = ({
                 className="flex flex-col items-center shrink-0 relative"
               >
                 {/* Date cells for this month */}
-                <div className="flex gap-1 mt-5">
+                <div className="flex gap-1 mt-3 xs:mt-2">
                   {groupDays.map((day, idx) => {
                     // Check if this day matches the selected date
                     const isSelected = selectedDate && 
@@ -150,7 +150,7 @@ export const DateBar: React.FC<DateBarProps> = ({
                     return (
                       <div key={group.start + idx} className="relative">
                         {shouldShowMonthLabel && (
-                          <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] sm:text-xs font-semibold text-foreground bg-card dark:bg-slate-800 px-1 rounded pointer-events-none select-none whitespace-nowrap z-20 border border-border dark:border-slate-600 shadow-sm">
+                          <div className="absolute -top-2 xs:-top-3 left-1/2 -translate-x-1/2 text-[8px] xs:text-[10px] sm:text-xs font-semibold text-foreground bg-card dark:bg-slate-800 px-0.5 xs:px-1 rounded pointer-events-none select-none whitespace-nowrap z-20 border border-border dark:border-slate-600 shadow-sm">
                             {group.month}
                           </div>
                         )}
@@ -160,18 +160,18 @@ export const DateBar: React.FC<DateBarProps> = ({
                           variant={isSelected ? "default" : "ghost"}
                           size="sm"
                           className={`
-                            flex flex-col items-center justify-center h-12 w-10 p-1 text-center
+                            flex flex-col items-center justify-center h-8 xs:h-10 sm:h-12 w-6 xs:w-8 sm:w-10 p-0.5 xs:p-1 text-center
                             ${isSelected 
-                              ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                              : 'hover:bg-accent hover:text-accent-foreground'
+                              ? 'bg-primary text-primary-foreground hover-primary-90' 
+                              : 'hover-accent touch-active'
                             }
-                            ${isWeekendDay && !isSelected ? 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/20' : ''}
+                            ${isWeekendDay && !isSelected ? 'text-emerald-600 dark:text-emerald-400 hover-emerald-700 dark:hover-emerald-300 hover-emerald-50 dark:hover-emerald-900-20' : ''}
                           `}
                         >
-                          <span className="text-sm font-semibold leading-none">
+                          <span className="text-[10px] xs:text-xs sm:text-sm font-semibold leading-none">
                             {dayNumber}
                           </span>
-                          <span className="text-[10px] font-medium leading-none mt-1 opacity-70">
+                          <span className="text-[7px] xs:text-[8px] sm:text-[10px] font-medium leading-none mt-0.5 xs:mt-1 opacity-70">
                             {weekday}
                           </span>
                         </Button>
@@ -185,16 +185,16 @@ export const DateBar: React.FC<DateBarProps> = ({
         </div>
       </div>
       {/* Action buttons */}
-      <div className="shrink-0 mr-4 flex items-center gap-2">
+      <div className="shrink-0 mr-1 xs:mr-2 sm:mr-4 flex items-center gap-1 xs:gap-2">
         {/* Dark Mode Toggle */}
         <Button
           onClick={toggleDarkMode}
           variant="outline"
           size="sm"
-          className="text-xs"
+          className="text-[10px] xs:text-xs h-6 xs:h-7 sm:h-8 w-6 xs:w-7 sm:w-8 p-0"
           aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {isDarkMode ? <Sun className="h-3 xs:h-4 w-3 xs:w-4" /> : <Moon className="h-3 xs:h-4 w-3 xs:w-4" />}
         </Button>
         
         {/* Share Link Button */}
@@ -203,9 +203,10 @@ export const DateBar: React.FC<DateBarProps> = ({
             onClick={onShareLink}
             variant="outline"
             size="sm"
-            className="text-xs"
+            className="text-[8px] xs:text-[10px] sm:text-xs h-6 xs:h-7 sm:h-8 px-1 xs:px-2 sm:px-3"
           >
-            Share Link
+            <span className="hidden xs:inline">Share Link</span>
+            <span className="xs:hidden">Share</span>
           </Button>
         )}
       </div>

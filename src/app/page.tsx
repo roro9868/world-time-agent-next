@@ -272,7 +272,7 @@ export default function Home() {
               <span className="text-sm font-medium">{notificationMessage}</span>
               <button 
                 onClick={() => setShowNotification(false)}
-                className="ml-2 text-white hover:text-gray-200 transition-colors"
+                className="ml-2 text-white hover-gray-200 transition-colors"
               >
                 ×
               </button>
@@ -293,7 +293,7 @@ export default function Home() {
           </div>
           
           {/* Time Zone Table Layout */}
-          <div className="container mx-auto px-2 xs:px-4 max-w-7xl">
+          <div className="container mx-auto px-1 xs:px-2 sm:px-4 max-w-7xl">
             <div className="w-full bg-card border border-border dark:border-slate-600 rounded-lg shadow-sm relative overflow-hidden">
               
                 <DndContext
@@ -327,12 +327,12 @@ export default function Home() {
                             aria-label="Date and location selector row"
                           >
                             <td 
-                              className="sticky left-0 z-30 bg-card px-1 xs:px-2 py-2 border-r border-border dark:border-slate-600"
+                              className="sticky left-0 z-30 bg-card px-0.5 xs:px-1 sm:px-2 py-1 xs:py-2 border-r border-border dark:border-slate-600"
                               role="gridcell"
                               aria-colindex={1}
                               style={{
                                 width: 'max-content',
-                                maxWidth: '200px',
+                                maxWidth: '180px',
                                 minWidth: '120px'
                               }}
                             >
@@ -341,7 +341,7 @@ export default function Home() {
                                 existingLocations={locations.map((l) => l.timezone)}
                               />
                             </td>
-                            <td className="px-0 py-2 overflow-hidden" colSpan={26}>
+                            <td className="px-0.5 py-1 pb-1 xs:py-0.5 xs:pb-0.5 overflow-hidden" colSpan={26}>
                               <div className="flex justify-center overflow-hidden">
                                 <DateBar
                                   selectedDate={selectedTime}

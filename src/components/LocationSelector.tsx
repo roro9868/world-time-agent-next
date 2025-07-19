@@ -215,9 +215,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
   }, [debouncedSearchTerm, matches.length]);
 
   return (
-    <div className="flex items-center gap-1 rounded px-1 py-1 max-w-full">
-      <div className="shrink-0 h-4 w-4 flex items-center justify-center">
-        <MapPin className="h-3 w-3 text-muted-foreground" />
+    <div className="flex items-center gap-0.5 xs:gap-1 rounded px-0.5 xs:px-1 py-0.5 xs:py-1 max-w-full">
+      <div className="shrink-0 h-3 xs:h-4 w-3 xs:w-4 flex items-center justify-center">
+        <MapPin className="h-2 xs:h-3 w-2 xs:w-3 text-muted-foreground" />
       </div>
       <div className="flex items-center min-w-0 flex-1">
         <input
@@ -226,8 +226,8 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           aria-controls="location-selector-dropdown"
           aria-expanded={isFocused}
           aria-label="Search for a city to add"
-          className="flex-1 bg-background border border-border dark:border-slate-600 rounded px-2 py-1 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring min-w-0 transition-colors"
-          placeholder="Add city..."
+          className="flex-1 bg-background border border-border dark:border-slate-600 rounded px-1 xs:px-2 py-0.5 xs:py-1 text-[10px] xs:text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring focus:border-ring min-w-[80px] xs:min-w-[100px] transition-colors"
+          placeholder="Add city"
           role="combobox"
           type="text"
           value={searchTerm}
@@ -256,7 +256,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 <button
                   key={`${entry.name}:${entry.city}`}
                   aria-selected={index === activeIndex}
-                  className={`w-full px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none ${
+                  className={`w-full px-2 xs:px-3 py-1.5 xs:py-2 text-left hover-accent focus:bg-accent focus:text-accent-foreground focus:outline-none touch-active ${
                     index === activeIndex ? 'bg-accent text-accent-foreground' : ''
                   }`}
                   id={`option-${index}`}
@@ -265,13 +265,13 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                   role="option"
                   type="button"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg shrink-0">{entry.flag}</span>
+                  <div className="flex items-center gap-1 xs:gap-2">
+                    <span className="text-sm xs:text-lg shrink-0">{entry.flag}</span>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-semibold text-foreground truncate">
+                      <span className="text-xs xs:text-sm font-semibold text-foreground truncate">
                         {entry.city}
                       </span>
-                      <span className="text-xs text-muted-foreground truncate">
+                      <span className="text-[10px] xs:text-xs text-muted-foreground truncate">
                         {entry.country} • {entry.name}
                       </span>
                     </div>
@@ -279,11 +279,11 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
                 </button>
               ))
             ) : notFound ? (
-              <div className="px-3 py-2 text-sm text-muted-foreground">
+              <div className="px-2 xs:px-3 py-1.5 xs:py-2 text-xs xs:text-sm text-muted-foreground">
                 No cities found
               </div>
             ) : (
-              <div className="px-3 py-2 text-sm text-muted-foreground">
+              <div className="px-2 xs:px-3 py-1.5 xs:py-2 text-xs xs:text-sm text-muted-foreground">
                 Start typing to search...
               </div>
             )}

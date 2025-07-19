@@ -32,23 +32,23 @@ const TimeZoneHeaderCell: React.FC<{
 }> = React.memo(({ location, isHome, onRemove, dragHandleProps, totalLocations }) => {
   return (
   <td
-    className={`sticky left-0 z-20 px-1 xs:px-2 py-2 xs:py-3 align-top border-r border-border transition-colors group-hover:bg-muted ${
-      isHome ? 'bg-blue-100 dark:bg-blue-900/60 border-l-2 border-l-blue-500 dark:border-l-blue-400' : 'bg-card'
+    className={`sticky left-0 z-20 px-0.5 xs:px-1 sm:px-2 py-1 xs:py-2 sm:py-3 align-top border-r border-border transition-colors hover-muted ${
+      isHome ? 'bg-blue-100 dark:bg-card border-l-2 border-l-blue-500 dark:border-l-blue-400' : 'bg-card'
     } overflow-hidden`}
     style={{
       width: 'max-content',
-      maxWidth: '200px',
+      maxWidth: '180px',
       minWidth: '120px'
     }}
   >
-    <div className="flex items-start gap-0.5 xs:gap-1">
+    <div className="flex items-start gap-0 xs:gap-0.5 sm:gap-1">
       {/* Left column: Drag Handle and Remove Button */}
       <div className="flex flex-col items-center shrink-0">
         {/* Drag Handle - aligned with city name */}
-        <div className="flex items-center h-5 xs:h-6">
+        <div className="flex items-center h-4 xs:h-5 sm:h-6">
           <Button
             {...dragHandleProps}
-            className="cursor-grab active:cursor-grabbing h-4 xs:h-5 w-4 xs:w-5 p-0 text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
+            className="cursor-grab active:cursor-grabbing h-3 xs:h-4 sm:h-5 w-3 xs:w-4 sm:w-5 p-0 text-muted-foreground hover-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-none"
             title="Drag to reorder"
             type="button"
             aria-label={`Drag ${location.timezone.city} to reorder`}
@@ -59,18 +59,18 @@ const TimeZoneHeaderCell: React.FC<{
             variant="ghost"
             size="icon"
           >
-            <GripVertical className="h-3 w-3" />
+            <GripVertical className="h-2 xs:h-3 sm:h-3 w-2 xs:w-3 sm:w-3" />
           </Button>
         </div>
         {/* Remove Button - aligned with second row */}
-        <div className="flex items-center h-5 xs:h-6 mt-1">
+        <div className="flex items-center h-4 xs:h-5 sm:h-6 mt-0.5 xs:mt-1">
           <Button
             onClick={() => onRemove(location.id)}
             disabled={totalLocations <= 1}
-            className={`h-4 xs:h-5 w-4 xs:w-5 p-0 transition-colors ${
+            className={`h-3 xs:h-4 sm:h-5 w-3 xs:w-4 sm:w-5 p-0 transition-colors ${
               totalLocations <= 1 
                 ? 'text-muted-foreground/30 cursor-not-allowed' 
-                : 'text-muted-foreground hover:text-destructive'
+                : 'text-muted-foreground hover-destructive'
             }`}
             title={
               totalLocations <= 1 
@@ -84,7 +84,7 @@ const TimeZoneHeaderCell: React.FC<{
             size="icon"
           >
             <svg
-              className="h-2 xs:h-3 w-2 xs:w-3"
+              className="h-1.5 xs:h-2 sm:h-3 w-1.5 xs:w-2 sm:w-3"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -104,12 +104,12 @@ const TimeZoneHeaderCell: React.FC<{
       {/* Right column: City info */}
       <div className="flex flex-col min-w-0 relative">
         {/* First row: city + flag + home icon */}
-        <div className="flex items-center min-w-0 gap-1 h-5 xs:h-6">
-          <span className="text-xs xs:text-sm font-semibold text-foreground">
+        <div className="flex items-center gap-0.5 xs:gap-1 h-4 xs:h-5 sm:h-6 flex-wrap">
+          <span className="text-[10px] xs:text-xs sm:text-sm font-semibold text-foreground dark:text-white">
             {location.timezone.city}
           </span>
           <span
-            className="text-base xs:text-lg shrink-0"
+            className="text-sm xs:text-base sm:text-lg shrink-0"
             role="img"
             aria-label={`Flag of ${location.timezone.country}`}
           >
@@ -117,16 +117,16 @@ const TimeZoneHeaderCell: React.FC<{
           </span>
           {isHome && (
             <span className="ml-1 flex items-center shrink-0">
-              <HomeIcon className="w-4 h-4 text-yellow-500" strokeWidth={2.2} />
+              <HomeIcon className="w-3 xs:w-4 sm:w-4 h-3 xs:h-4 sm:h-4 text-yellow-500" strokeWidth={2.2} />
             </span>
           )}
         </div>
         {/* Second row: abbr + current time */}
-        <div className="flex items-center text-[10px] xs:text-xs text-muted-foreground mt-1 h-5 xs:h-6">
-          <span className="px-1 xs:px-1.5 py-0.5 rounded bg-secondary dark:bg-slate-700 text-secondary-foreground dark:text-slate-200 text-[8px] xs:text-[10px] font-medium whitespace-nowrap shrink-0 border border-border dark:border-slate-600">
+        <div className="flex items-center text-[8px] xs:text-[10px] sm:text-xs text-muted-foreground mt-0.5 xs:mt-1 h-4 xs:h-5 sm:h-6">
+          <span className="px-0.5 xs:px-1 sm:px-1.5 py-0 xs:py-0.5 rounded bg-secondary dark:bg-slate-600 text-secondary-foreground dark:text-white text-[7px] xs:text-[8px] sm:text-[10px] font-medium whitespace-nowrap shrink-0 border border-border dark:border-slate-500">
             {getTimezoneAbbrForDate(new Date(), location.timezone.name)}
           </span>
-          <span className="text-slate-700 dark:text-slate-200 font-semibold text-[10px] xs:text-xs ml-1">
+          <span className="text-slate-700 dark:text-slate-900 font-semibold text-[8px] xs:text-[10px] sm:text-xs ml-0.5 xs:ml-1">
             {formatTime(new Date(), location.timezone.name)}
           </span>
         </div>
@@ -175,8 +175,8 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
       <tr
         ref={setNodeRef}
         style={style}
-        className={`group hover:bg-muted/30 transition-colors border-b border-border ${
-          isHomeRow ? 'bg-blue-100/50 dark:bg-blue-900/30 border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
+        className={`group hover-muted-30 transition-colors border-b border-border ${
+          isHomeRow ? 'bg-blue-100/50 dark:bg-none border-l-4 border-l-blue-500 dark:border-l-blue-400' : ''
         } ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
         aria-label={`Time zone row for ${location.timezone.city}`}
         {...attributes}

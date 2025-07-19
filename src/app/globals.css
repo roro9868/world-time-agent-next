@@ -128,4 +128,110 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* Modern hover utilities - only apply to devices that support true hovering */
+  @media (hover: hover) {
+    .hover-accent:hover {
+      background-color: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+    
+    .hover-muted:hover {
+      background-color: hsl(var(--muted));
+    }
+    
+    .hover-muted-30:hover {
+      background-color: hsl(var(--muted) / 0.3);
+    }
+    
+    .hover-primary-90:hover {
+      background-color: hsl(var(--primary) / 0.9);
+    }
+    
+    .hover-destructive:hover {
+      background-color: hsl(var(--destructive));
+      color: hsl(var(--destructive-foreground));
+    }
+    
+    .hover-foreground:hover {
+      color: hsl(var(--foreground));
+    }
+    
+    .hover-gray-200:hover {
+      color: rgb(229 231 235);
+    }
+    
+    .hover-amber-200:hover {
+      background-color: rgb(253 230 138);
+    }
+    
+    .hover-blue-200:hover {
+      background-color: rgb(191 219 254);
+    }
+    
+    .hover-amber-700:hover {
+      background-color: rgb(180 83 9);
+    }
+    
+    .hover-blue-700:hover {
+      background-color: rgb(29 78 216);
+    }
+    
+    .hover-blue-600:hover {
+      background-color: rgb(37 99 235);
+    }
+    
+    .hover-slate-700:hover {
+      background-color: rgb(51 65 85);
+    }
+    
+    .hover-emerald-700:hover {
+      color: rgb(21 128 61);
+    }
+    
+    .hover-emerald-300:hover {
+      color: rgb(110 231 183);
+    }
+    
+    .hover-emerald-50:hover {
+      background-color: rgb(236 253 245);
+    }
+    
+    .hover-emerald-900-20:hover {
+      background-color: rgb(6 78 59 / 0.2);
+    }
+    
+    .hover-underline:hover {
+      text-decoration: underline;
+    }
+    
+    .hover-secondary-80:hover {
+      background-color: hsl(var(--secondary) / 0.8);
+    }
+    
+    .hover-destructive-90:hover {
+      background-color: hsl(var(--destructive) / 0.9);
+    }
+  }
+
+  /* Touch-friendly alternatives for devices without hover */
+  @media (hover: none) {
+    .touch-active:active {
+      background-color: hsl(var(--accent));
+      color: hsl(var(--accent-foreground));
+    }
+    
+    .touch-active-muted:active {
+      background-color: hsl(var(--muted));
+    }
+    
+    .touch-active-primary:active {
+      background-color: hsl(var(--primary) / 0.9);
+    }
+    
+    .touch-active-destructive:active {
+      background-color: hsl(var(--destructive));
+      color: hsl(var(--destructive-foreground));
+    }
+  }
 }
