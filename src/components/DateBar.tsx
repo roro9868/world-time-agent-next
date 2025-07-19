@@ -127,8 +127,8 @@ export const DateBar: React.FC<DateBarProps> = ({
 
                     // Show the month label logic:
                     // 1. Always show for the middle date (index 4 in the 9-day range)
-                    // 2. Show for last day of previous month (when next day is first of new month)
-                    // 3. Don't show for first day of month if same month as middle date
+                    // 2. Show for last day of previous month (when next day is first of new month AND different month than middle)
+                    // 3. Show for first day of month if different month than the middle
                     const globalIdx = group.start + idx;
                     const isMiddleDate = globalIdx === 4; // Middle of 9-day range
                     const middleDate = days[4];
@@ -138,8 +138,14 @@ export const DateBar: React.FC<DateBarProps> = ({
                     const isLastDayOfMonth = nextDay && nextDay.getDate() === 1 && 
                       (day.getMonth() !== nextDay.getMonth() || day.getFullYear() !== nextDay.getFullYear());
                     
-                    // Only show month label if it's the middle date OR it's the last day of a different month than the middle
-                    const shouldShowMonthLabel = isMiddleDate || (isLastDayOfMonth && day.getMonth() !== middleDate.getMonth());
+                    // Check if this day is first of a different month than the middle
+                    const isFirstDayOfDifferentMonth = day.getDate() === 1 && 
+                      (day.getMonth() !== middleDate.getMonth() || day.getFullYear() !== middleDate.getFullYear());
+                    
+                    // Show month label if it's the middle date OR it's the last day of a different month OR it's the first day of a different month
+                    const shouldShowMonthLabel = isMiddleDate || 
+                      (isLastDayOfMonth && day.getMonth() !== middleDate.getMonth()) || 
+                      isFirstDayOfDifferentMonth;
 
                     return (
                       <div key={group.start + idx} className="relative">
