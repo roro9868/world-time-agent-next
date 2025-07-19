@@ -5,43 +5,34 @@ import { Button } from "./ui/button";
 import { Calendar, Moon, Sun } from 'lucide-react';
 import { CustomDatePicker } from "./ui/custom-date-picker";
 import { useDarkMode } from '../hooks/useDarkMode';
-import type { TimeSlot } from '../types';
 
 interface DateBarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
-  homeTimezone: string;
   onShareLink?: () => void;
-  selectedTimeCell?: TimeSlot | null;
-  homeTimeSlots?: TimeSlot[]; // Add home time slots for direct indexing
   anchorDate?: Date; // Add anchor date prop to avoid timezone conversion issues
 }
 
 export const DateBar: React.FC<DateBarProps> = ({ 
   selectedDate, 
   onDateChange, 
-  homeTimezone, 
   onShareLink, 
-  selectedTimeCell,
-  homeTimeSlots,
   anchorDate 
 }) => {
   const selectedDayRef = useRef<HTMLButtonElement>(null);
   const [pickerDate, setPickerDate] = React.useState<Date | undefined>(selectedDate);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
-  // Optimized: Use indexing to derive the date range directly from anchor date
-  // This eliminates timezone conversions and uses the existing data structure
-  const { days, centerDate } = React.useMemo(() => {
+  // Simplified: Use anchor date directly to derive the date range
+  const { days } = React.useMemo(() => {
     if (!anchorDate) {
       throw new Error('DateBar requires anchorDate to be provided');
     }
     
-    // Use the anchor date directly (it's already the correct midnight in home timezone)
+    // anchorDate is already a local date, use it directly
     const baseDate = new Date(anchorDate);
     
     // Generate 9 days centered on the anchor date (4 before + center + 4 after)
-    // Use simple date arithmetic instead of timezone conversions
     const days: Date[] = [];
     for (let i = -4; i <= 4; i++) {
       const date = new Date(baseDate);
@@ -49,8 +40,8 @@ export const DateBar: React.FC<DateBarProps> = ({
       days.push(date);
     }
     
-    return { days, centerDate: days[4] };
-  }, [anchorDate, homeTimezone]);
+    return { days };
+  }, [anchorDate]);
   
   const monthGroups = groupByMonth(days);
 

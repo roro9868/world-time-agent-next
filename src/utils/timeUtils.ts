@@ -26,8 +26,7 @@ export const formatTime = (date: Date, timeZone: string): string => {
  * @param baseDate - The reference date in home timezone (local time)
  * @param homeTimezone - IANA timezone identifier for home location
  * @param targetTimezone - IANA timezone identifier for target location
- * @param selectedTime - Currently selected time for highlighting (optional)
- * @param selectedUtcDate - Selected UTC date for calculations (optional)
+ * @param selectedColumnIndex - Currently selected column index for highlighting
  * @returns Array of TimeSlot objects with local and UTC times
  * 
  * @example
@@ -35,7 +34,7 @@ export const formatTime = (date: Date, timeZone: string): string => {
  *   new Date('2024-01-01'),
  *   'America/New_York',
  *   'Asia/Tokyo',
- *   new Date()
+ *   12
  * );
  * // Returns 26 time slots showing Tokyo times aligned to NYC midnight
  */
@@ -43,8 +42,6 @@ export function generateAlignedTimeSlots(
   baseDate: Date, // selected date (local time)
   homeTimezone: string,
   targetTimezone: string,
-  selectedTime?: Date,
-  selectedUtcDate?: Date,
   selectedColumnIndex?: number,
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
@@ -64,7 +61,7 @@ export function generateAlignedTimeSlots(
     // Convert to the target city's local time
     const localDate = toZonedTime(utcSlot, targetTimezone);
     const isWeekendDay = isWeekend(localDate);
-    // Use column index for selection instead of UTC time matching
+    // Use column index for selection
     const isSelected = selectedColumnIndex !== undefined ? i === selectedColumnIndex : false;
     
 

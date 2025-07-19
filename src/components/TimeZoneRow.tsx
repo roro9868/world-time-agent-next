@@ -11,12 +11,11 @@ import { Home as HomeIcon } from 'lucide-react';
 
 interface TimeZoneRowProps {
   location: Location;
-  onTimeSlotClick: (colIdx: number, utc: Date, localDate: Date, timezoneName: string) => void;
+  onTimeSlotClick: (colIdx: number, utc: Date, localDate: Date) => void;
   onRemove: (id: string) => void;
   isHome?: boolean;
   homeTimezone?: string;
   anchorDate: Date;
-  selectedUtcDate: Date;
   selectedColumnIndex: number;
   totalLocations: number;
 }
@@ -141,7 +140,6 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
     onRemove,
     homeTimezone,
     anchorDate,
-    selectedUtcDate,
     selectedColumnIndex,
     totalLocations,
   }) => {
@@ -154,11 +152,9 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
         anchorDate,
         homeTimezone || timezone.name,
         timezone.name,
-        anchorDate,
-        selectedUtcDate,
         selectedColumnIndex,
       );
-    }, [anchorDate, homeTimezone, timezone.name, selectedUtcDate, selectedColumnIndex]);
+    }, [anchorDate, homeTimezone, timezone.name, selectedColumnIndex]);
 
     // Make the row draggable
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -197,7 +193,7 @@ const TimeZoneRow: React.FC<TimeZoneRowProps> = React.memo(
             colIdx={colIdx}
             timeSlots={timeSlots}
             timezone={timezone}
-            onTimeSlotClick={() => onTimeSlotClick(colIdx, slot.utc, slot.date, timezone.name)}
+            onTimeSlotClick={() => onTimeSlotClick(colIdx, slot.utc, slot.date)}
           />
         ))}
       </tr>

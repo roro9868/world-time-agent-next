@@ -68,7 +68,7 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
 
     const baseTime = getHomeMidnightDate(new Date(), userTimezone);
     
-    const homeSlots = generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, baseTime, undefined, 0);
+    const homeSlots = generateAlignedTimeSlots(baseTime, userTimezone, userTimezone, 0);
     const initialUtc = homeSlots[0].utc;
     
     // Helper function to get flag emoji from country code
@@ -124,8 +124,6 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
             baseTime,
             userTimezone,
             city.name,
-            baseTime,
-            initialUtc,
             0,
           ),
         };
@@ -231,8 +229,6 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
         baseTime,
         userTimezone,
         userTimezone,
-        baseTime,
-        initialUtc,
         0,
       ),
     };
@@ -277,7 +273,6 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
         ) {
           return prev; // Don't add if already exists
         }
-        const currentUtcDate = selectedUtcDate || new Date();
         return [
           ...prev,
           {
@@ -288,15 +283,13 @@ export const useTimeZoneData = (): UseTimeZoneDataReturn => {
               selectedTime,
               homeTimezone,
               timezone.name,
-              selectedTime,
-              currentUtcDate,
               0,
             ),
           },
         ];
       });
     },
-    [selectedTime, selectedUtcDate, homeTimezone],
+    [selectedTime, homeTimezone],
   );
 
   const removeLocation = useCallback((id: string) => {
